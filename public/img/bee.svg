@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Bibi, a abelha mascote do EnglishBite -->
+  <ellipse cx="100" cy="186" rx="52" ry="8" fill="#000" opacity=".08"/>
+  <!-- asas -->
+  <ellipse cx="62" cy="58" rx="30" ry="40" transform="rotate(-28 62 58)" fill="#ddf4ff" stroke="#84d8ff" stroke-width="5"/>
+  <ellipse cx="138" cy="58" rx="30" ry="40" transform="rotate(28 138 58)" fill="#ddf4ff" stroke="#84d8ff" stroke-width="5"/>
+  <!-- antenas -->
+  <path d="M84 44 Q76 18 60 14" fill="none" stroke="#3c3c3c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M116 44 Q124 18 140 14" fill="none" stroke="#3c3c3c" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="58" cy="13" r="8" fill="#3c3c3c"/>
+  <circle cx="142" cy="13" r="8" fill="#3c3c3c"/>
+  <!-- corpo -->
+  <ellipse cx="100" cy="118" rx="66" ry="64" fill="#ffc800"/>
+  <path d="M40 122 Q100 138 160 122 L162 142 Q100 160 38 142 Z" fill="#3c3c3c"/>
+  <path d="M52 158 Q100 172 148 158 L140 170 Q100 184 60 170 Z" fill="#3c3c3c"/>
+  <ellipse cx="100" cy="118" rx="66" ry="64" fill="none" stroke="#e5a800" stroke-width="5"/>
+  <!-- olhos -->
+  <ellipse cx="76" cy="92" rx="19" ry="21" fill="#fff"/>
+  <ellipse cx="124" cy="92" rx="19" ry="21" fill="#fff"/>
+  <circle cx="80" cy="95" r="10" fill="#3c3c3c"/>
+  <circle cx="120" cy="95" r="10" fill="#3c3c3c"/>
+  <circle cx="84" cy="90" r="4" fill="#fff"/>
+  <circle cx="124" cy="90" r="4" fill="#fff"/>
+  <!-- bochechas e sorriso -->
+  <ellipse cx="56" cy="112" rx="9" ry="6" fill="#ff9600" opacity=".55"/>
+  <ellipse cx="144" cy="112" rx="9" ry="6" fill="#ff9600" opacity=".55"/>
+  <path d="M86 112 Q100 124 114 112" fill="#ff4b4b" stroke="#3c3c3c" stroke-width="5" stroke-linejoin="round"/>
+</svg>
