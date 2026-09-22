@@ -36,7 +36,38 @@ const Sounds = (() => {
     }
   }
 
+  // Pronúncia em inglês usando a voz do próprio navegador
+  let voice = null;
+  function pickVoice() {
+    if (!("speechSynthesis" in window)) return null;
+    const voices = speechSynthesis.getVoices();
+    return (
+      voices.find((v) => v.lang === "en-US" && /Google|Natural|Samantha|Aria|Jenny/i.test(v.name)) ||
+      voices.find((v) => v.lang === "en-US") ||
+      voices.find((v) => v.lang && v.lang.startsWith("en")) ||
+      null
+    );
+  }
+  if ("speechSynthesis" in window) {
+    speechSynthesis.onvoiceschanged = () => (voice = pickVoice());
+  }
+
+  function say(text, slow) {
+    safe(() => {
+      if (!("speechSynthesis" in window)) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      voice = voice || pickVoice();
+      if (voice) u.voice = voice;
+      u.lang = "en-US";
+      u.rate = slow ? 0.55 : 0.95;
+      speechSynthesis.speak(u);
+    });
+  }
+
   return {
+    say,
+    canSpeak: () => "speechSynthesis" in window,
     click: () => safe(() => tone(600, 0, 0.06, "sine", 0.07)),
     select: () => safe(() => tone(500, 0, 0.05, "sine", 0.06)),
     correct: () =>
@@ -66,6 +97,6 @@ const Sounds = (() => {
 })();
 
 document.addEventListener("click", (e) => {
-  const el = e.target.closest(".btn, .node, .tab-btn, .copy-btn");
+  const el = e.target.closest(".btn, .lesson-node, .side-link");
   if (el) Sounds.click();
 });

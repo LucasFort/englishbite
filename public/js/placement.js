@@ -34,15 +34,17 @@
     progressFill.style.width = Math.round((qIndex / questions.length) * 100) + "%";
     quizBody.innerHTML = `
       <div class="question-card">
+        <div class="ex-label">🎯 Pergunta ${qIndex + 1} de ${questions.length}</div>
         <h2>${q.question}</h2>
-        <div id="optionsBox"></div>
+        <div class="options" id="optionsBox"></div>
       </div>
     `;
     const optionsBox = document.getElementById("optionsBox");
     q.options.forEach((opt, i) => {
       const btn = document.createElement("button");
       btn.className = "option";
-      btn.textContent = opt;
+      btn.innerHTML = `<span class="key">${i + 1}</span><span></span>`;
+      btn.lastChild.textContent = opt;
       btn.addEventListener("click", () => selectOption(i, q));
       optionsBox.appendChild(btn);
     });
@@ -86,12 +88,13 @@
     progressFill.style.width = "100%";
     Sounds.levelUp();
     const info = levelInfo[level];
+    skipBtn.style.visibility = "hidden";
     quizBody.innerHTML = `
-      <div class="question-card result-card">
-        <span class="big-emoji">${info.emoji}</span>
-        <h2>Nível: ${info.title}</h2>
-        <p style="color:#6b7a76;">${info.desc}</p>
-        <a href="home.html" class="btn btn-primary" id="continueBtn" style="margin-top:12px;">Começar minha trilha</a>
+      <div class="result-card">
+        <img class="mascot" src="img/bee.svg" alt="">
+        <h2>${info.emoji} Nível: ${info.title}</h2>
+        <p class="sub">${info.desc}</p>
+        <a href="home.html" class="btn btn-block" id="continueBtn" style="max-width:330px">Começar minha trilha</a>
       </div>
     `;
 
