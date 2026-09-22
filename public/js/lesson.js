@@ -1,175 +1,466 @@
 (async function () {
   Api.requireAuth();
 
-  const params = new URLSearchParams(window.location.search);
-  const unitId = params.get("unit");
-  const lessonBody = document.getElementById("lessonBody");
+  const unitId = new URLSearchParams(window.location.search).get("unit");
+  const body = document.getElementById("lessonBody");
   const progressFill = document.getElementById("progressFill");
   const heartsBox = document.getElementById("heartsBox");
-  const feedbackBanner = document.getElementById("feedbackBanner");
-  const feedbackText = document.getElementById("feedbackText");
-  const feedbackExplanation = document.getElementById("feedbackExplanation");
-  const continueBtn = document.getElementById("continueBtn");
+  const heartsVal = document.getElementById("heartsVal");
+  const footer = document.getElementById("footer");
+  const mainBtn = document.getElementById("mainBtn");
+  const skipBtn = document.getElementById("skipBtn");
+  const fbBadge = document.getElementById("fbBadge");
+  const fbTitle = document.getElementById("fbTitle");
+  const fbDetail = document.getElementById("fbDetail");
+  const quitModal = document.getElementById("quitModal");
+
+  const MAX_HEARTS = 5;
+  const PRAISE = ["Excelente!", "Muito bem!", "Isso aí!", "Mandou bem!", "Perfeito!", "Incrível!"];
 
   let lesson = null;
-  let stage = "intro"; // intro -> quiz -> result
-  let qIndex = 0;
-  let hearts = 3;
-  let correctCount = 0;
-  let answered = false;
-
+  let isReview = false;
   try {
-    const lessons = await fetch("data/lessons.json").then((r) => r.json());
+    const [lessons, progress] = await Promise.all([
+      fetch("data/lessons.json").then((r) => r.json()),
+      Api.request("/api/progress", { auth: true }).catch(() => null),
+    ]);
     lesson = lessons.find((l) => l.id === unitId);
+    isReview = !!(progress && (progress.completedUnits || []).includes(unitId));
   } catch (err) {
-    lessonBody.innerHTML = `<p style="color:#c62828">Não foi possível carregar a lição.</p>`;
+    body.innerHTML = `<p style="color:var(--red-dark)">Não foi possível carregar a lição.</p>`;
     return;
   }
-
   if (!lesson) {
-    lessonBody.innerHTML = `<p style="color:#c62828">Lição não encontrada.</p>`;
+    body.innerHTML = `<p style="color:var(--red-dark)">Lição não encontrada.</p>`;
     return;
   }
-
   document.title = lesson.title + " — EnglishBite";
-  renderIntro();
 
-  function renderHearts() {
-    heartsBox.textContent = "❤️".repeat(hearts) + "🖤".repeat(3 - hearts);
-  }
+  const canSpeak = Sounds.canSpeak();
+  let listeningOff = false;
+  const queue = buildQueue(lesson);
+  const total = queue.length;
+  let solved = 0;
+  let hearts = MAX_HEARTS;
+  let mistakes = 0;
+  let firstTry = 0;
+  let ex = null; // exercício atual
+  let state = "answering"; // answering | checked | done
+  const startedAt = Date.now();
 
-  function renderIntro() {
-    progressFill.style.width = "0%";
-    lessonBody.innerHTML = `
-      <div class="question-card">
-        <span style="font-size:2.4rem;">${lesson.icon}</span>
-        <h2>${lesson.title}</h2>
-        <p style="color:#6b7a76; margin-bottom:20px;">${lesson.tip}</p>
-        ${lesson.vocabulary
-          .map(
-            (v) => `
-          <div class="vocab-card">
-            <div class="word">${v.word}</div>
-            <div class="meaning">${v.meaning}</div>
-            <div class="example">"${v.example}"</div>
-          </div>`
-          )
-          .join("")}
-        <button class="btn btn-primary btn-block" id="startQuizBtn" style="margin-top:20px;">Começar quiz</button>
-      </div>
-    `;
-    document.getElementById("startQuizBtn").addEventListener("click", () => {
-      stage = "quiz";
-      qIndex = 0;
-      hearts = 3;
-      correctCount = 0;
-      renderHearts();
-      renderQuestion();
-    });
-  }
+  document.getElementById("quitBtn").addEventListener("click", () => {
+    if (state === "done") window.location.href = "home.html";
+    else quitModal.classList.add("show");
+  });
+  document.getElementById("stayBtn").addEventListener("click", () => quitModal.classList.remove("show"));
 
-  function renderQuestion() {
-    answered = false;
-    const q = lesson.quiz[qIndex];
-    progressFill.style.width = Math.round((qIndex / lesson.quiz.length) * 100) + "%";
-    lessonBody.innerHTML = `
-      <div class="question-card">
-        <h2>${q.question}</h2>
-        <div id="optionsBox"></div>
-      </div>
-    `;
-    const optionsBox = document.getElementById("optionsBox");
-    q.options.forEach((opt, i) => {
-      const btn = document.createElement("button");
-      btn.className = "option";
-      btn.textContent = opt;
-      btn.addEventListener("click", () => selectOption(i, btn));
-      optionsBox.appendChild(btn);
-    });
-  }
+  mainBtn.addEventListener("click", onMain);
+  skipBtn.addEventListener("click", () => {
+    if (state !== "answering" || !ex || ex.type !== "listen") return;
+    listeningOff = true; // "Não posso ouvir agora": pula os exercícios de áudio, sem perder vida
+    if (!ex.redo) solved++;
+    next();
+  });
 
-  function selectOption(i, btnEl) {
-    if (answered) return;
-    answered = true;
-    const q = lesson.quiz[qIndex];
-    const allOptions = document.querySelectorAll(".option");
-    const isCorrect = i === q.answer;
-
-    allOptions.forEach((el, idx) => {
-      el.style.pointerEvents = "none";
-      if (idx === q.answer) el.classList.add("correct");
-      else if (idx === i) el.classList.add("wrong");
-    });
-
-    if (isCorrect) {
-      correctCount++;
-      Sounds.correct();
-      feedbackBanner.className = "feedback-banner correct show";
-      feedbackText.className = "feedback-text correct-text";
-      feedbackText.textContent = "Certinho! 🎉";
-    } else {
-      hearts = Math.max(0, hearts - 1);
-      Sounds.wrong();
-      renderHearts();
-      feedbackBanner.className = "feedback-banner wrong show";
-      feedbackText.className = "feedback-text wrong-text";
-      feedbackText.textContent = "Não foi dessa vez";
-    }
-    feedbackExplanation.textContent = q.explanation || "";
-  }
-
-  continueBtn.addEventListener("click", () => {
-    feedbackBanner.classList.remove("show");
-    if (hearts <= 0) {
-      renderResult(false);
+  document.addEventListener("keydown", (e) => {
+    if (quitModal.classList.contains("show")) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!mainBtn.disabled) mainBtn.click();
       return;
     }
-    qIndex++;
-    if (qIndex >= lesson.quiz.length) {
-      renderResult(true);
-    } else {
-      renderQuestion();
+    if (state !== "answering") return;
+    if (/^[0-9]$/.test(e.key)) {
+      const n = e.key === "0" ? 10 : Number(e.key);
+      const opts = body.querySelectorAll(".option:not(:disabled), .word-bank .tile:not(.used)");
+      if (opts[n - 1]) opts[n - 1].click();
+    } else if (e.key === "Backspace") {
+      const placed = body.querySelectorAll(".answer-line .tile");
+      if (placed.length) placed[placed.length - 1].click();
     }
   });
 
-  async function renderResult(passed) {
-    stage = "result";
-    progressFill.style.width = "100%";
-    const xpEarned = passed ? correctCount * 10 : correctCount * 5;
-    if (passed) Sounds.complete();
-    else Sounds.tryAgain();
+  // ---------- Montagem da lição ----------
+  function buildQueue(l) {
+    const v = shuffle(l.vocabulary.slice());
+    const buildable = shuffle(v.filter((w) => !/[\/()]/.test(w.word) && tokens(w.word).length >= 2));
+    const q = [];
+    const add = (x) => x && q.push(x);
+    add({ type: "meaning", item: v[0], isNew: true });
+    add({ type: "meaning", item: v[1], isNew: true });
+    if (canSpeak) add({ type: "listen", item: v[2] });
+    if (buildable[0]) add({ type: "translate", item: buildable[0] });
+    add({ type: "match", items: v.slice(0, 5) });
+    add({ type: "meaning", item: v[3], isNew: true });
+    if (canSpeak && v[4]) add({ type: "listen", item: v[4] });
+    if (buildable[1]) add({ type: "translate", item: buildable[1] });
+    if (v[5]) add({ type: "meaning", item: v[5], isNew: true });
+    l.quiz.forEach((item) => add({ type: "quiz", item }));
+    return q.filter((x) => x.item || x.items);
+  }
 
-    lessonBody.innerHTML = `
-      <div class="question-card result-card">
-        <span class="big-emoji">${passed ? "🏆" : "💪"}</span>
-        <h2>${passed ? "Lição concluída!" : "Quase lá!"}</h2>
-        <p style="color:#6b7a76;">${passed ? "Você mandou bem nesta lição." : "Você ficou sem vidas, mas pode tentar de novo."}</p>
-        <div class="result-stats">
-          <div class="result-stat"><div class="value">${correctCount}/${lesson.quiz.length}</div><div class="label">Acertos</div></div>
-          <div class="result-stat"><div class="value">+${xpEarned}</div><div class="label">XP ganho</div></div>
-        </div>
-        <div style="display:flex; gap:12px; justify-content:center; margin-top:12px;">
-          ${!passed ? '<button class="btn btn-secondary" id="retryBtn">Tentar de novo</button>' : ""}
-          <a href="home.html" class="btn btn-primary" id="homeBtn">Voltar à trilha</a>
-        </div>
-      </div>
-    `;
+  // ---------- Fluxo ----------
+  function next() {
+    if (hearts <= 0) return finish(false);
+    ex = queue.shift();
+    while (ex && ex.type === "listen" && listeningOff) {
+      if (!ex.redo) solved++;
+      ex = queue.shift();
+    }
+    if (!ex) return finish(true);
+
+    state = "answering";
+    footer.className = "lesson-footer";
+    mainBtn.textContent = "Verificar";
+    mainBtn.disabled = true;
+    skipBtn.style.visibility = ex.type === "listen" ? "visible" : "hidden";
+    skipBtn.textContent = "Não posso ouvir agora";
+    updateProgress();
+    body.style.pointerEvents = "";
+    RENDER[ex.type](ex);
+    window.scrollTo(0, 0);
+  }
+
+  function onMain() {
+    if (state === "answering") {
+      const res = ex.check();
+      showResult(res);
+    } else if (state === "checked") {
+      next();
+    } else if (state === "done") {
+      ex.onDone();
+    }
+  }
+
+  function setReady(ready) {
+    if (state === "answering") mainBtn.disabled = !ready;
+  }
+
+  function showResult({ ok, answer, speak }) {
+    state = "checked";
+    body.style.pointerEvents = "none";
+    mainBtn.disabled = false;
+    mainBtn.textContent = "Continuar";
+    if (ok) {
+      solved++;
+      if (!ex.redo) firstTry++;
+      Sounds.correct();
+      footer.className = "lesson-footer correct";
+      fbBadge.textContent = "✓";
+      fbTitle.textContent = pick(PRAISE);
+      fbDetail.textContent = ex.type === "quiz" && ex.item.explanation ? ex.item.explanation : "";
+      if (speak) setTimeout(() => Sounds.say(speak), 250);
+    } else {
+      hearts = Math.max(0, hearts - 1);
+      mistakes++;
+      Sounds.wrong();
+      renderHearts(true);
+      footer.className = "lesson-footer wrong";
+      fbBadge.textContent = "✕";
+      fbTitle.textContent = "Resposta correta:";
+      fbDetail.textContent = answer + (ex.type === "quiz" && ex.item.explanation ? " — " + ex.item.explanation : "");
+      queue.push(Object.assign({}, ex, { redo: true })); // o erro volta no fim da lição
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    progressFill.style.width = Math.min(100, Math.round((solved / total) * 100)) + "%";
+  }
+
+  function renderHearts(bump) {
+    heartsVal.textContent = hearts;
+    if (bump) {
+      heartsBox.classList.remove("bump");
+      void heartsBox.offsetWidth;
+      heartsBox.classList.add("bump");
+    }
+  }
+
+  // ---------- Tipos de exercício ----------
+  const RENDER = {
+    meaning(e) {
+      const w = e.item;
+      const opts = shuffle([w.meaning, ...sample(lesson.vocabulary.filter((x) => x !== w).map((x) => x.meaning), 3)]);
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, e.isNew ? "✨ Nova palavra" : "")}
+          <h2>O que significa?</h2>
+          <div class="prompt">
+            <img src="img/bee.svg" alt="">
+            <div class="speech">
+              <button class="speak-btn" data-say aria-label="Ouvir">🔊</button>
+              <span>${esc(w.word)}</span>
+            </div>
+          </div>
+          <div class="options">${opts.map(optionHtml).join("")}</div>
+        </div>`;
+      body.querySelector("[data-say]").addEventListener("click", () => Sounds.say(speakable(w.word)));
+      Sounds.say(speakable(w.word));
+      const choose = singleChoice(opts);
+      e.check = () => ({ ok: opts[choose()] === w.meaning, answer: w.meaning });
+    },
+
+    listen(e) {
+      const w = e.item;
+      const opts = shuffle([w.word, ...sample(lesson.vocabulary.filter((x) => x !== w).map((x) => x.word), 3)]);
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, "🎧 Escuta")}
+          <h2>Toque no que você ouvir</h2>
+          <div class="speak-big">
+            <button data-say aria-label="Ouvir">🔊</button>
+            <button data-say-slow class="slow" aria-label="Ouvir devagar">🐢</button>
+          </div>
+          <div class="options">${opts.map(optionHtml).join("")}</div>
+        </div>`;
+      body.querySelector("[data-say]").addEventListener("click", () => Sounds.say(speakable(w.word)));
+      body.querySelector("[data-say-slow]").addEventListener("click", () => Sounds.say(speakable(w.word), true));
+      setTimeout(() => Sounds.say(speakable(w.word)), 300);
+      const choose = singleChoice(opts);
+      e.check = () => ({ ok: opts[choose()] === w.word, answer: w.word });
+    },
+
+    translate(e) {
+      const w = e.item;
+      const answerTokens = tokens(w.word);
+      const lower = new Set(answerTokens.map((t) => t.toLowerCase()));
+      const pool = [];
+      lesson.vocabulary.forEach((x) => {
+        if (x === w || /[\/()]/.test(x.word)) return;
+        tokens(x.word).forEach((t) => {
+          if (!lower.has(t.toLowerCase()) && !pool.some((p) => p.toLowerCase() === t.toLowerCase())) pool.push(t);
+        });
+      });
+      const bank = shuffle([...answerTokens, ...sample(pool, Math.min(3, pool.length))]);
+
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, "✍️ Tradução")}
+          <h2>Escreva isso em inglês</h2>
+          <div class="prompt">
+            <img src="img/bee.svg" alt="">
+            <div class="speech"><span>${esc(w.meaning)}</span></div>
+          </div>
+          <div class="answer-line" id="answerLine"></div>
+          <div class="word-bank" id="wordBank">
+            ${bank.map((t, i) => `<button class="tile" data-i="${i}">${esc(t)}</button>`).join("")}
+          </div>
+        </div>`;
+
+      const line = body.querySelector("#answerLine");
+      const placed = [];
+      body.querySelectorAll("#wordBank .tile").forEach((src) => {
+        src.addEventListener("click", () => {
+          if (src.classList.contains("used")) return;
+          Sounds.select();
+          src.classList.add("used");
+          const i = Number(src.dataset.i);
+          placed.push(i);
+          const chip = document.createElement("button");
+          chip.className = "tile";
+          chip.textContent = bank[i];
+          chip.addEventListener("click", () => {
+            placed.splice(placed.indexOf(i), 1);
+            chip.remove();
+            src.classList.remove("used");
+            setReady(placed.length > 0);
+          });
+          line.appendChild(chip);
+          setReady(true);
+        });
+      });
+      e.check = () => ({
+        ok: placed.map((i) => bank[i].toLowerCase()).join(" ") === answerTokens.map((t) => t.toLowerCase()).join(" "),
+        answer: w.word,
+        speak: w.word,
+      });
+    },
+
+    match(e) {
+      const pairs = e.items;
+      const left = shuffle(pairs.map((p, i) => ({ text: p.word, i })));
+      const right = shuffle(pairs.map((p, i) => ({ text: p.meaning, i })));
+      let n = 0;
+      const btn = (x, side) => {
+        n++;
+        return `<button class="option" data-side="${side}" data-i="${x.i}"><span class="key">${n % 10}</span><span>${esc(x.text)}</span></button>`;
+      };
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, "🧩 Pares")}
+          <h2>Toque nos pares correspondentes</h2>
+          <div class="match-grid">
+            <div class="match-col">${left.map((x) => btn(x, "L")).join("")}</div>
+            <div class="match-col">${right.map((x) => btn(x, "R")).join("")}</div>
+          </div>
+        </div>`;
+
+      let sel = { L: null, R: null };
+      let matched = 0;
+      body.querySelectorAll(".match-grid .option").forEach((b) => {
+        b.addEventListener("click", () => {
+          if (b.disabled) return;
+          const side = b.dataset.side;
+          if (sel[side]) sel[side].classList.remove("selected");
+          sel[side] = b;
+          b.classList.add("selected");
+          if (side === "L") Sounds.say(speakable(pairs[b.dataset.i].word));
+          if (!sel.L || !sel.R) return Sounds.select();
+
+          const a = sel.L;
+          const c = sel.R;
+          sel = { L: null, R: null };
+          if (a.dataset.i === c.dataset.i) {
+            [a, c].forEach((x) => {
+              x.classList.remove("selected");
+              x.classList.add("correct");
+              x.disabled = true;
+              setTimeout(() => {
+                x.classList.remove("correct");
+                x.classList.add("matched");
+              }, 350);
+            });
+            matched++;
+            if (matched === pairs.length) {
+              setTimeout(() => showResult({ ok: true }), 400);
+            } else {
+              Sounds.select();
+            }
+          } else {
+            Sounds.wrong();
+            [a, c].forEach((x) => {
+              x.classList.remove("selected");
+              x.classList.add("flash-wrong");
+              setTimeout(() => x.classList.remove("flash-wrong"), 400);
+            });
+          }
+        });
+      });
+      e.check = () => ({ ok: false, answer: "" }); // concluído automaticamente
+    },
+
+    quiz(e) {
+      const q = e.item;
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, "📝 Desafio")}
+          <h2>${esc(q.question)}</h2>
+          <div class="options">${q.options.map(optionHtml).join("")}</div>
+        </div>`;
+      const choose = singleChoice(q.options);
+      e.check = () => ({ ok: choose() === q.answer, answer: q.options[q.answer] });
+    },
+  };
+
+  function singleChoice(opts) {
+    let chosen = -1;
+    const buttons = body.querySelectorAll(".options .option");
+    buttons.forEach((b, i) => {
+      b.addEventListener("click", () => {
+        buttons.forEach((x) => x.classList.remove("selected"));
+        b.classList.add("selected");
+        chosen = i;
+        Sounds.select();
+        if (ex.type === "listen") Sounds.say(speakable(opts[i]));
+        setReady(true);
+      });
+    });
+    return () => chosen;
+  }
+
+  function optionHtml(text, i) {
+    return `<button class="option"><span class="key">${i + 1}</span><span>${esc(text)}</span></button>`;
+  }
+
+  function label(e, text) {
+    if (e.redo) return `<div class="ex-label redo">🔁 Erro anterior</div>`;
+    return text ? `<div class="ex-label">${text}</div>` : "";
+  }
+
+  renderHearts();
+  next();
+
+  // ---------- Fim da lição ----------
+  async function finish(passed) {
+    state = "done";
+    body.style.pointerEvents = "";
+    skipBtn.style.visibility = "hidden";
+    footer.className = "lesson-footer";
+    mainBtn.disabled = false;
+    ex = {};
 
     if (!passed) {
-      document.getElementById("retryBtn").addEventListener("click", () => {
-        stage = "intro";
-        renderIntro();
-      });
+      Sounds.tryAgain();
+      body.innerHTML = `
+        <div class="result-card">
+          <img class="mascot" src="img/bee.svg" alt="" style="filter:grayscale(.6)">
+          <h2 class="fail">Você ficou sem vidas 💔</h2>
+          <p class="sub">Tudo bem errar — é assim que se aprende. Que tal tentar de novo?</p>
+        </div>`;
+      mainBtn.textContent = "Tentar de novo";
+      skipBtn.textContent = "Sair";
+      skipBtn.style.visibility = "visible";
+      skipBtn.onclick = () => (window.location.href = "home.html");
+      ex.onDone = () => window.location.reload();
+      return;
     }
+
+    progressFill.style.width = "100%";
+    Sounds.complete();
+    const xpEarned = isReview ? 5 : 10 + (mistakes === 0 ? 5 : 0);
+    const accuracy = Math.round((firstTry / total) * 100);
+    const secs = Math.round((Date.now() - startedAt) / 1000);
+    const time = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+
+    body.innerHTML = `
+      <div class="result-card">
+        <img class="mascot" src="img/bee.svg" alt="">
+        <h2>${mistakes === 0 ? "Lição perfeita!" : "Lição concluída!"}</h2>
+        <p class="sub">${mistakes === 0 ? "Nenhum erro — bônus de +5 XP! 🎉" : "Você mandou bem. Continue assim!"}</p>
+        <div class="result-stats">
+          <div class="result-stat" style="--tone:var(--gold)"><div class="label">Total de XP</div><div class="value">⚡ ${xpEarned}</div></div>
+          <div class="result-stat" style="--tone:var(--green)"><div class="label">Precisão</div><div class="value">🎯 ${Math.min(100, accuracy)}%</div></div>
+          <div class="result-stat" style="--tone:var(--blue)"><div class="label">Tempo</div><div class="value">⏱️ ${time}</div></div>
+        </div>
+      </div>`;
+    mainBtn.textContent = "Continuar";
+    mainBtn.disabled = true;
+    ex.onDone = () => (window.location.href = "home.html");
 
     try {
       await Api.request("/api/progress", {
         method: "POST",
         auth: true,
-        body: { unitId: lesson.id, xpEarned, passed },
+        body: { unitId: lesson.id, xpEarned, passed: true },
       });
     } catch (err) {
-      if (err.message === "UNAUTHORIZED") Api.logout();
+      if (err.message === "UNAUTHORIZED") return Api.logout();
     }
+    mainBtn.disabled = false;
+  }
+
+  // ---------- Utilidades ----------
+  function tokens(s) {
+    return s.replace(/[?!.,;:]/g, "").split(/\s+/).filter(Boolean);
+  }
+  function speakable(s) {
+    return s.replace(/\s*\/\s*/g, ", ");
+  }
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function sample(a, n) {
+    return shuffle(Array.from(new Set(a))).slice(0, n);
+  }
+  function pick(a) {
+    return a[Math.floor(Math.random() * a.length)];
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 })();
