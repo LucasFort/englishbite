@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sua trilha — EnglishBite</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="home.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
+    <div class="stat-pills">
+      <div class="stat-pill">🔥 <span id="streakVal">0</span></div>
+      <div class="stat-pill">⭐ <span id="xpVal">0</span></div>
+    </div>
+    <div class="user-menu">
+      <div class="avatar" id="avatarInitial">?</div>
+      <a href="placement.html" class="btn btn-ghost" style="display:none;" id="retakeBtn">Refazer teste</a>
+      <button class="btn btn-ghost" id="logoutBtn">Sair</button>
+    </div>
+  </div>
+
+  <div class="path" id="path">
+    <p style="color:#6b7a76">Carregando sua trilha...</p>
+  </div>
+
+  <footer class="site-footer">Criado por <strong>Lucas Fortunato</strong></footer>
+
+  <script src="js/sounds.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

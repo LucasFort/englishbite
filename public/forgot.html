@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recuperar senha — EnglishBite</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
+  </nav>
+
+  <div class="center-screen">
+    <div class="auth-card">
+      <h1>Esqueceu sua senha?</h1>
+      <p class="lead">Informe seu e-mail e enviaremos um código para redefinir a senha.</p>
+
+      <div class="alert alert-error" id="errorBox"></div>
+
+      <form id="forgotForm">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" required placeholder="voce@email.com">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Enviar código</button>
+      </form>
+
+      <p class="form-footer"><a href="login.html">Voltar para o login</a></p>
+    </div>
+  </div>
+
+  <script src="js/sounds.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById("forgotForm");
+    const errorBox = document.getElementById("errorBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove("show");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Enviando...";
+
+      const email = document.getElementById("email").value.trim().toLowerCase();
+
+      try {
+        const data = await Api.request("/api/forgot-password", { method: "POST", body: { email } });
+        sessionStorage.setItem("eb_reset_email", email);
+        if (data.devCode) {
+          sessionStorage.setItem("eb_dev_code", data.devCode);
+        }
+        window.location.href = "reset.html";
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add("show");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar código";
+      }
+    });
+  </script>
+</body>
+</html>

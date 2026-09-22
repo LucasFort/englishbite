@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — EnglishBite</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
+  </nav>
+
+  <div class="center-screen">
+    <div class="auth-card">
+      <h1>Bem-vindo de volta</h1>
+      <p class="lead">Entre para continuar aprendendo.</p>
+
+      <div class="alert alert-error" id="errorBox"></div>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" required placeholder="voce@email.com">
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input type="password" id="password" required placeholder="Sua senha">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Entrar</button>
+      </form>
+
+      <p class="form-footer"><a href="forgot.html">Esqueci minha senha</a></p>
+      <p class="form-footer">Não tem conta? <a href="signup.html">Criar conta</a></p>
+    </div>
+  </div>
+
+  <footer class="site-footer">Criado por <strong>Lucas Fortunato</strong></footer>
+
+  <script src="js/sounds.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById("loginForm");
+    const errorBox = document.getElementById("errorBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove("show");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Entrando...";
+
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      try {
+        const data = await Api.request("/api/login", { method: "POST", body: { email, password } });
+        Api.setToken(data.token);
+        Api.setUser(data.user);
+        window.location.href = "home.html";
+      } catch (err) {
+        if (err.message === "EMAIL_NOT_VERIFIED") {
+          sessionStorage.setItem("eb_pending_email", email);
+          window.location.href = "verify.html";
+          return;
+        }
+        errorBox.textContent = err.message;
+        errorBox.classList.add("show");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Entrar";
+      }
+    });
+  </script>
+</body>
+</html>

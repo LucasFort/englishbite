@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirme seu e-mail — EnglishBite</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
+  </nav>
+
+  <div class="center-screen">
+    <div class="auth-card">
+      <h1>Confirme seu e-mail</h1>
+      <p class="lead">Enviamos um código de 6 dígitos para <strong id="emailLabel"></strong>.</p>
+
+      <div class="alert alert-info" id="devBox"></div>
+      <div class="alert alert-error" id="errorBox"></div>
+      <div class="alert alert-success" id="successBox"></div>
+
+      <form id="verifyForm">
+        <div class="field">
+          <label for="code">Código de verificação</label>
+          <input type="text" id="code" required maxlength="6" placeholder="000000" inputmode="numeric">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Confirmar</button>
+      </form>
+
+      <p class="form-footer">Não recebeu? <a href="#" id="resendLink">Reenviar código</a></p>
+    </div>
+  </div>
+
+  <script src="js/sounds.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const email = sessionStorage.getItem("eb_pending_email");
+    if (!email) window.location.href = "signup.html";
+    document.getElementById("emailLabel").textContent = email;
+
+    const devCode = sessionStorage.getItem("eb_dev_code");
+    const devBox = document.getElementById("devBox");
+    if (devCode) {
+      devBox.textContent = "Modo teste (sem envio real de e-mail): seu código é " + devCode;
+      devBox.classList.add("show");
+    }
+
+    const form = document.getElementById("verifyForm");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove("show");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Confirmando...";
+
+      const code = document.getElementById("code").value.trim();
+
+      try {
+        await Api.request("/api/verify-email", { method: "POST", body: { email, code } });
+        sessionStorage.removeItem("eb_pending_email");
+        sessionStorage.removeItem("eb_dev_code");
+        successBox.textContent = "E-mail confirmado! Redirecionando para o login...";
+        successBox.classList.add("show");
+        setTimeout(() => (window.location.href = "login.html"), 1200);
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add("show");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Confirmar";
+      }
+    });
+
+    document.getElementById("resendLink").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        const data = await Api.request("/api/resend-code", { method: "POST", body: { email, purpose: "verify" } });
+        if (data.devCode) {
+          sessionStorage.setItem("eb_dev_code", data.devCode);
+          devBox.textContent = "Modo teste (sem envio real de e-mail): seu código é " + data.devCode;
+          devBox.classList.add("show");
+        } else {
+          successBox.textContent = "Código reenviado para seu e-mail.";
+          successBox.classList.add("show");
+        }
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add("show");
+      }
+    });
+  </script>
+</body>
+</html>

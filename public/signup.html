@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criar conta — EnglishBite</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
+  </nav>
+
+  <div class="center-screen">
+    <div class="auth-card">
+      <h1>Criar sua conta</h1>
+      <p class="lead">Leva menos de um minuto.</p>
+
+      <div class="alert alert-error" id="errorBox"></div>
+
+      <form id="signupForm">
+        <div class="field">
+          <label for="name">Nome</label>
+          <input type="text" id="name" required placeholder="Seu nome">
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" required placeholder="voce@email.com">
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input type="password" id="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Criar conta</button>
+      </form>
+
+      <p class="form-footer">Já tem conta? <a href="login.html">Entrar</a></p>
+    </div>
+  </div>
+
+  <footer class="site-footer">Criado por <strong>Lucas Fortunato</strong></footer>
+
+  <script src="js/sounds.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById("signupForm");
+    const errorBox = document.getElementById("errorBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove("show");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Criando...";
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      try {
+        const data = await Api.request("/api/register", { method: "POST", body: { name, email, password } });
+        sessionStorage.setItem("eb_pending_email", email);
+        if (data.devCode) {
+          sessionStorage.setItem("eb_dev_code", data.devCode);
+        }
+        window.location.href = "verify.html";
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add("show");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Criar conta";
+      }
+    });
+  </script>
+</body>
+</html>
