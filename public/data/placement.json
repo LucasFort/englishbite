@@ -1,0 +1,11 @@
+[
+  { "question": "Como se diz 'Bom dia' em inglês?", "options": ["Good night", "Good morning", "Goodbye", "Good evening"], "answer": 1 },
+  { "question": "Complete: 'She ___ a teacher.'", "options": ["is", "are", "am", "be"], "answer": 0 },
+  { "question": "O que significa 'wake up'?", "options": ["dormir", "acordar", "comer", "trabalhar"], "answer": 1 },
+  { "question": "Complete: 'Yesterday, I ___ to the market.'", "options": ["go", "goes", "went", "going"], "answer": 2 },
+  { "question": "O que significa o phrasal verb 'give up'?", "options": ["continuar", "desistir", "comprar", "vender"], "answer": 1 },
+  { "question": "Complete: 'I'd like ___ book a room.'", "options": ["to", "for", "at", "in"], "answer": 0 },
+  { "question": "O que significa 'It's raining cats and dogs'?", "options": ["Está chovendo pouco", "Está chovendo muito forte", "Vai nevar", "Está ensolarado"], "answer": 1 },
+  { "question": "Escolha a frase correta:", "options": ["If I would have more time, I will travel.", "If I had more time, I would travel.", "If I have more time, I would traveled.", "If I having more time, I travel."], "answer": 1 },
+  { "question": "O que significa 'to follow up' num contexto de trabalho?", "options": ["ignorar", "dar continuidade / retornar", "cancelar", "comemorar"], "answer": 1 }
+]

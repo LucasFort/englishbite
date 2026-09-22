@@ -1,1 +1,178 @@
-x
+[
+  {
+    "id": "greetings",
+    "title": "Saudações e Apresentações",
+    "icon": "👋",
+    "level": "A1",
+    "tip": "Em inglês, a forma de cumprimentar muda com a hora do dia e o grau de formalidade. 'Hi' e 'Hello' funcionam a qualquer hora; 'Good morning/afternoon/evening' são mais formais.",
+    "vocabulary": [
+      { "word": "Hello / Hi", "meaning": "Olá / Oi", "example": "Hi! My name is Ana." },
+      { "word": "Good morning", "meaning": "Bom dia", "example": "Good morning, everyone!" },
+      { "word": "Nice to meet you", "meaning": "Prazer em conhecê-lo(a)", "example": "Nice to meet you, John." },
+      { "word": "How are you?", "meaning": "Como você está?", "example": "Hi Sarah, how are you today?" },
+      { "word": "I'm fine, thanks", "meaning": "Estou bem, obrigado(a)", "example": "I'm fine, thanks. And you?" },
+      { "word": "See you later", "meaning": "Até mais", "example": "I have to go now. See you later!" }
+    ],
+    "quiz": [
+      { "question": "Como se diz 'Prazer em conhecê-lo' em inglês?", "options": ["See you later", "Nice to meet you", "Good morning", "How are you?"], "answer": 1, "explanation": "'Nice to meet you' é usado quando conhecemos alguém pela primeira vez." },
+      { "question": "Qual cumprimento é mais formal?", "options": ["Hi", "Hey", "Good afternoon", "Yo"], "answer": 2, "explanation": "'Good afternoon' é usado em contextos mais formais, como no trabalho." },
+      { "question": "Complete: 'Hi Tom, ___ are you?'", "options": ["what", "how", "who", "where"], "answer": 1, "explanation": "A pergunta correta sobre o estado de alguém é 'How are you?'." },
+      { "question": "O que significa 'I'm fine, thanks'?", "options": ["Eu sou fino, obrigado", "Estou bem, obrigado", "Eu termino, obrigado", "Estou multado, obrigado"], "answer": 1, "explanation": "É a resposta comum e educada para 'How are you?'." },
+      { "question": "Como você se despede de forma casual?", "options": ["Nice to meet you", "Good evening", "See you later", "How are you?"], "answer": 2, "explanation": "'See you later' é uma despedida informal e comum." }
+    ]
+  },
+  {
+    "id": "daily-routine",
+    "title": "Rotina Diária",
+    "icon": "☀️",
+    "level": "A1",
+    "tip": "Para falar de hábitos e rotina, usamos o Present Simple. Não esqueça o 's' na terceira pessoa: 'She wakes up at 7am.'",
+    "vocabulary": [
+      { "word": "wake up", "meaning": "acordar", "example": "I wake up at 6:30am every day." },
+      { "word": "have breakfast", "meaning": "tomar café da manhã", "example": "We have breakfast together." },
+      { "word": "go to work", "meaning": "ir trabalhar", "example": "He goes to work by bus." },
+      { "word": "get home", "meaning": "chegar em casa", "example": "I usually get home at 6pm." },
+      { "word": "have dinner", "meaning": "jantar", "example": "They have dinner at 8pm." },
+      { "word": "go to bed", "meaning": "ir dormir", "example": "She goes to bed early on weekdays." }
+    ],
+    "quiz": [
+      { "question": "Complete: 'She ___ up at 7am.' (wake)", "options": ["wake", "wakes", "waking", "woke"], "answer": 1, "explanation": "Na terceira pessoa do Present Simple, acrescentamos 's': 'wakes'." },
+      { "question": "O que significa 'go to work'?", "options": ["ir para casa", "ir trabalhar", "ir dormir", "ir comer"], "answer": 1, "explanation": "'Go to work' significa 'ir trabalhar'." },
+      { "question": "Qual frase está correta?", "options": ["He go to work at 8am.", "He goes to work at 8am.", "He going to work at 8am.", "He gone to work at 8am."], "answer": 1, "explanation": "A forma correta na terceira pessoa é 'goes'." },
+      { "question": "Complete: 'We usually ___ dinner at home.'", "options": ["has", "having", "have", "had"], "answer": 2, "explanation": "Com 'We' (não é terceira pessoa do singular), usamos 'have'." },
+      { "question": "Como se diz 'chegar em casa'?", "options": ["go to bed", "get home", "wake up", "have breakfast"], "answer": 1, "explanation": "'Get home' significa 'chegar em casa'." }
+    ]
+  },
+  {
+    "id": "phrasal-verbs",
+    "title": "Phrasal Verbs do Dia a Dia",
+    "icon": "🔗",
+    "level": "A2",
+    "tip": "Phrasal verbs são combinações de verbo + preposição/advérbio que mudam o significado original. Ex: 'look' (olhar) + 'for' = 'look for' (procurar).",
+    "vocabulary": [
+      { "word": "look for", "meaning": "procurar", "example": "I'm looking for my keys." },
+      { "word": "give up", "meaning": "desistir", "example": "Don't give up on your dreams." },
+      { "word": "find out", "meaning": "descobrir", "example": "I need to find out what happened." },
+      { "word": "turn off", "meaning": "desligar", "example": "Can you turn off the lights?" },
+      { "word": "get up", "meaning": "levantar-se", "example": "I get up early on weekdays." },
+      { "word": "come back", "meaning": "voltar", "example": "She will come back tomorrow." }
+    ],
+    "quiz": [
+      { "question": "O que significa 'give up'?", "options": ["continuar", "desistir", "subir", "entregar"], "answer": 1, "explanation": "'Give up' significa desistir de algo." },
+      { "question": "Complete: 'I'm ___ my phone. Have you seen it?'", "options": ["looking for", "giving up", "turning off", "coming back"], "answer": 0, "explanation": "'Look for' é usado quando procuramos algo." },
+      { "question": "Qual phrasal verb significa 'descobrir'?", "options": ["turn off", "find out", "get up", "give up"], "answer": 1, "explanation": "'Find out' é usado quando descobrimos uma informação." },
+      { "question": "'Please, ___ the TV before you sleep.'", "options": ["find out", "look for", "turn off", "come back"], "answer": 2, "explanation": "'Turn off' significa desligar um aparelho." },
+      { "question": "O que significa 'come back'?", "options": ["voltar", "ir embora", "acordar", "procurar"], "answer": 0, "explanation": "'Come back' significa retornar a um lugar." }
+    ]
+  },
+  {
+    "id": "travel",
+    "title": "Inglês para Viagem",
+    "icon": "✈️",
+    "level": "A2",
+    "tip": "Saber frases-chave de viagem ajuda muito em aeroportos, hotéis e restaurantes. Praticar essas frases dá mais confiança na hora de viajar.",
+    "vocabulary": [
+      { "word": "Where is the check-in?", "meaning": "Onde é o check-in?", "example": "Excuse me, where is the check-in for this flight?" },
+      { "word": "I'd like to book a room", "meaning": "Eu gostaria de reservar um quarto", "example": "I'd like to book a room for two nights." },
+      { "word": "How much does it cost?", "meaning": "Quanto custa?", "example": "How much does it cost to get to the airport?" },
+      { "word": "Could I have the menu, please?", "meaning": "Poderia me trazer o cardápio, por favor?", "example": "Could I have the menu, please?" },
+      { "word": "I'm lost", "meaning": "Estou perdido(a)", "example": "Excuse me, I'm lost. Can you help me?" },
+      { "word": "boarding pass", "meaning": "cartão de embarque", "example": "Please show your boarding pass here." }
+    ],
+    "quiz": [
+      { "question": "Como perguntar o preço de algo?", "options": ["Where is it?", "How much does it cost?", "What time is it?", "Who are you?"], "answer": 1, "explanation": "'How much does it cost?' é a forma correta de perguntar o preço." },
+      { "question": "O que significa 'boarding pass'?", "options": ["passaporte", "cartão de embarque", "mala", "bilhete de trem"], "answer": 1, "explanation": "'Boarding pass' é o documento necessário para embarcar no avião." },
+      { "question": "Como pedir o cardápio educadamente?", "options": ["Give me the menu!", "Could I have the menu, please?", "Menu now.", "I want food."], "answer": 1, "explanation": "'Could I have... please?' é uma forma educada de pedir algo." },
+      { "question": "'I'd like to book a room' significa:", "options": ["Eu quero cancelar um quarto", "Eu gostaria de reservar um quarto", "Eu tenho um quarto", "Eu perdi meu quarto"], "answer": 1, "explanation": "É usado para fazer uma reserva de hotel." },
+      { "question": "O que dizer se você está perdido?", "options": ["I'm lost", "I'm tired", "I'm hungry", "I'm late"], "answer": 0, "explanation": "'I'm lost' significa 'estou perdido(a)'." }
+    ]
+  },
+  {
+    "id": "past-tense",
+    "title": "Tempos Verbais: Passado",
+    "icon": "⏳",
+    "level": "A2",
+    "tip": "Verbos regulares no passado terminam em '-ed' (walk → walked). Verbos irregulares mudam de forma (go → went) e precisam ser memorizados.",
+    "vocabulary": [
+      { "word": "went (go)", "meaning": "foi/fui", "example": "I went to the cinema yesterday." },
+      { "word": "saw (see)", "meaning": "vi/viu", "example": "She saw a great movie last night." },
+      { "word": "had (have)", "meaning": "tive/teve", "example": "We had a wonderful trip." },
+      { "word": "worked (work)", "meaning": "trabalhei/trabalhou", "example": "He worked late yesterday." },
+      { "word": "did (do)", "meaning": "fiz/fez", "example": "Did you do your homework?" },
+      { "word": "didn't (did not)", "meaning": "não fiz/fez", "example": "I didn't watch TV last night." }
+    ],
+    "quiz": [
+      { "question": "Qual é o passado de 'go'?", "options": ["goed", "went", "gone", "going"], "answer": 1, "explanation": "'Go' é irregular; o passado simples é 'went'." },
+      { "question": "Complete: 'She ___ a movie last night.' (see)", "options": ["see", "sees", "saw", "seen"], "answer": 2, "explanation": "O passado de 'see' é 'saw'." },
+      { "question": "Como formar a negativa no passado?", "options": ["don't + verbo", "didn't + verbo no passado", "didn't + verbo no infinitivo", "not + verbo"], "answer": 2, "explanation": "Usamos 'didn't' + verbo no infinitivo (sem 'to'): 'I didn't watch'." },
+      { "question": "Qual verbo é regular?", "options": ["go", "see", "work", "have"], "answer": 2, "explanation": "'Work' é regular: work → worked." },
+      { "question": "Complete: 'Did you ___ your homework?'", "options": ["did", "do", "done", "doing"], "answer": 1, "explanation": "Depois de 'did' usamos o verbo no infinitivo sem 'to': 'do'." }
+    ]
+  },
+  {
+    "id": "idioms",
+    "title": "Expressões Idiomáticas",
+    "icon": "💬",
+    "level": "B1",
+    "tip": "Expressões idiomáticas não devem ser traduzidas ao pé da letra. O sentido delas é figurado, então é melhor aprender o significado real de cada uma.",
+    "vocabulary": [
+      { "word": "It's raining cats and dogs", "meaning": "Está chovendo muito forte", "example": "We can't go out, it's raining cats and dogs." },
+      { "word": "Break the ice", "meaning": "Quebrar o gelo", "example": "He told a joke to break the ice." },
+      { "word": "Piece of cake", "meaning": "Muito fácil", "example": "The test was a piece of cake." },
+      { "word": "Under the weather", "meaning": "Se sentindo mal/doente", "example": "I feel a bit under the weather today." },
+      { "word": "Once in a blue moon", "meaning": "Raramente", "example": "I eat fast food once in a blue moon." },
+      { "word": "Hit the books", "meaning": "Estudar bastante", "example": "I have to hit the books for my exam." }
+    ],
+    "quiz": [
+      { "question": "O que significa 'Piece of cake'?", "options": ["Pedaço de bolo literal", "Algo muito fácil", "Algo muito difícil", "Uma sobremesa"], "answer": 1, "explanation": "'Piece of cake' é usado para dizer que algo é muito fácil." },
+      { "question": "'It's raining cats and dogs' quer dizer:", "options": ["Está chovendo animais", "Está chovendo pouco", "Está chovendo muito forte", "Vai chover amanhã"], "answer": 2, "explanation": "É uma expressão para dizer que está chovendo muito." },
+      { "question": "'I feel under the weather' significa:", "options": ["Estou no tempo", "Estou me sentindo mal", "Estou com frio", "Estou feliz"], "answer": 1, "explanation": "Significa estar se sentindo doente ou indisposto." },
+      { "question": "'Break the ice' é usado quando:", "options": ["quebramos algo de vidro", "aliviamos uma situação desconfortável", "fazemos gelo", "terminamos um relacionamento"], "answer": 1, "explanation": "Usamos para descrever a ação de tornar uma situação social menos tensa." },
+      { "question": "'Once in a blue moon' significa:", "options": ["Todos os dias", "Raramente", "À noite", "Uma vez por mês exatamente"], "answer": 1, "explanation": "Expressão usada para algo que acontece muito raramente." }
+    ]
+  },
+  {
+    "id": "news-vocabulary",
+    "title": "Vocabulário de Notícias",
+    "icon": "📰",
+    "level": "B1",
+    "tip": "Manchetes de notícias costumam usar palavras curtas e diretas. Conhecer esse vocabulário ajuda a entender jornais e noticiários em inglês.",
+    "vocabulary": [
+      { "word": "headline", "meaning": "manchete", "example": "The headline says prices are rising." },
+      { "word": "to announce", "meaning": "anunciar", "example": "The company announced new rules today." },
+      { "word": "to launch", "meaning": "lançar", "example": "They launched a new product this week." },
+      { "word": "government", "meaning": "governo", "example": "The government released a new report." },
+      { "word": "to warn", "meaning": "alertar", "example": "Scientists warn about climate change." },
+      { "word": "to face (a problem)", "meaning": "enfrentar", "example": "The city is facing a water shortage." }
+    ],
+    "quiz": [
+      { "question": "O que é uma 'headline'?", "options": ["um jornalista", "uma manchete", "uma revista", "um repórter"], "answer": 1, "explanation": "'Headline' é o título principal de uma notícia." },
+      { "question": "'To announce' significa:", "options": ["esconder", "anunciar", "cancelar", "assinar"], "answer": 1, "explanation": "'Announce' é comunicar algo publicamente." },
+      { "question": "Complete: 'The city is ___ a serious problem.'", "options": ["facing", "launching", "warning", "announcing"], "answer": 0, "explanation": "'Face a problem' significa enfrentar um problema." },
+      { "question": "O que significa 'to warn'?", "options": ["comemorar", "alertar", "ignorar", "vender"], "answer": 1, "explanation": "'Warn' significa avisar sobre um risco ou perigo." },
+      { "question": "'To launch a product' significa:", "options": ["comprar um produto", "lançar um produto", "devolver um produto", "consertar um produto"], "answer": 1, "explanation": "'Launch' é usado quando algo novo é apresentado ao público." }
+    ]
+  },
+  {
+    "id": "business-english",
+    "title": "Inglês nos Negócios",
+    "icon": "💼",
+    "level": "B1",
+    "tip": "No ambiente de trabalho, o inglês costuma ser mais formal e direto. Frases educadas para pedir e sugerir coisas são essenciais em reuniões e e-mails.",
+    "vocabulary": [
+      { "word": "deadline", "meaning": "prazo final", "example": "The deadline for this project is Friday." },
+      { "word": "to schedule a meeting", "meaning": "agendar uma reunião", "example": "Let's schedule a meeting for Monday." },
+      { "word": "to follow up", "meaning": "dar continuidade/retornar", "example": "I'll follow up on this email tomorrow." },
+      { "word": "feedback", "meaning": "retorno/opinião", "example": "Thank you for your feedback." },
+      { "word": "to reach out", "meaning": "entrar em contato", "example": "Feel free to reach out if you have questions." },
+      { "word": "on track", "meaning": "dentro do planejado", "example": "The project is on track for launch." }
+    ],
+    "quiz": [
+      { "question": "O que é um 'deadline'?", "options": ["um chefe", "um prazo final", "uma reunião", "um contrato"], "answer": 1, "explanation": "'Deadline' é a data limite para entregar algo." },
+      { "question": "Como dizer 'entrar em contato'?", "options": ["to follow up", "to reach out", "to schedule", "to feedback"], "answer": 1, "explanation": "'Reach out' significa entrar em contato com alguém." },
+      { "question": "'On track' significa:", "options": ["atrasado", "dentro do planejado", "cancelado", "fora do prazo"], "answer": 1, "explanation": "'On track' indica que algo está progredindo como planejado." },
+      { "question": "O que significa 'feedback'?", "options": ["prazo", "retorno/opinião", "reunião", "contrato"], "answer": 1, "explanation": "'Feedback' é uma opinião ou avaliação sobre algo feito." },
+      { "question": "Como dizer 'agendar uma reunião'?", "options": ["to follow up a meeting", "to schedule a meeting", "to reach a meeting", "to track a meeting"], "answer": 1, "explanation": "'Schedule a meeting' significa marcar uma reunião." }
+    ]
+  }
+]
