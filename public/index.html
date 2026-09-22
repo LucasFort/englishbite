@@ -3,71 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EnglishBite — Aprenda inglês em pequenos passos</title>
+<title>EnglishBite — Aprenda inglês em pequenas mordidas</title>
+<link rel="icon" href="img/bee.svg">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav class="nav">
-    <a href="index.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
-    <div class="nav-links">
-      <a href="login.html" class="btn btn-ghost">Entrar</a>
-      <a href="signup.html" class="btn btn-primary">Criar conta</a>
+  <header class="site-header">
+    <div class="inner">
+      <a href="index.html" class="brand"><img src="img/bee.svg" alt=""> englishbite</a>
+      <a href="login.html" class="btn btn-white btn-sm">Entrar</a>
     </div>
-  </nav>
+  </header>
 
-  <div class="container">
-    <section class="hero">
-      <div class="hero-text">
-        <h1>Aprenda inglês <span class="highlight">em pequenas doses</span>, todos os dias.</h1>
-        <p>Lições curtas de vocabulário, gramática, phrasal verbs e expressões — no estilo dos programas de inglês da BBC, com quizzes, pontos de experiência e sequência diária, num formato leve e divertido.</p>
-        <div class="hero-actions">
-          <a href="signup.html" class="btn btn-primary">Começar agora — é grátis</a>
-          <a href="login.html" class="btn btn-secondary">Já tenho conta</a>
+  <section class="hero">
+    <div class="hero-art"><img src="img/bee.svg" alt="Bibi, a abelha do EnglishBite"></div>
+    <div class="hero-text">
+      <h1>Aprenda inglês um pouquinho por dia — de graça e sem enrolação.</h1>
+      <a href="signup.html" class="btn">Comece agora</a>
+      <a href="login.html" class="btn btn-white">Já tenho uma conta</a>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="inner">
+      <div class="feature-row">
+        <div class="copy">
+          <h2>divertido e eficaz</h2>
+          <p>Lições curtas com exercícios de escuta, montagem de frases e pares de palavras. Você aprende jogando, em poucos minutos por dia.</p>
         </div>
+        <div class="art" style="background:var(--green-light)">🎯</div>
       </div>
-      <div class="hero-art">
-        <svg width="320" height="280" viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="160" cy="250" rx="120" ry="16" fill="#e3ece8"/>
-          <circle cx="160" cy="120" r="95" fill="#e5f8ee"/>
-          <text x="160" y="95" font-size="46" text-anchor="middle">🐝</text>
-          <rect x="90" y="150" width="140" height="30" rx="15" fill="#2fb380"/>
-          <text x="160" y="171" font-size="14" fill="#fff" text-anchor="middle" font-family="Segoe UI">Hello!</text>
-          <rect x="60" y="60" width="70" height="24" rx="12" fill="#3d8bfd"/>
-          <text x="95" y="76" font-size="12" fill="#fff" text-anchor="middle" font-family="Segoe UI">Good job!</text>
-          <rect x="190" y="190" width="90" height="24" rx="12" fill="#ffb100"/>
-          <text x="235" y="206" font-size="12" fill="#fff" text-anchor="middle" font-family="Segoe UI">+10 XP</text>
-        </svg>
+      <div class="feature-row reverse">
+        <div class="copy">
+          <h2>no seu ritmo</h2>
+          <p>Um teste rápido descobre seu nível e te coloca no ponto certo da trilha — do "Hello" às expressões idiomáticas.</p>
+        </div>
+        <div class="art" style="background:var(--blue-light)">🧭</div>
       </div>
-    </section>
+      <div class="feature-row">
+        <div class="copy">
+          <h2>mantenha a ofensiva</h2>
+          <p>Ganhe XP, não perca todas as vidas e volte todo dia para manter sua ofensiva acesa. 🔥</p>
+        </div>
+        <div class="art" style="background:#fff0d9">🔥</div>
+      </div>
+    </div>
+  </section>
 
-    <section class="features">
-      <div class="feature-card">
-        <span class="emoji">📚</span>
-        <h3>Lições curtas</h3>
-        <p>Vocabulário, gramática e expressões em unidades de poucos minutos.</p>
-      </div>
-      <div class="feature-card">
-        <span class="emoji">🎯</span>
-        <h3>Quizzes interativos</h3>
-        <p>Pratique o que aprendeu com perguntas de múltipla escolha e feedback na hora.</p>
-      </div>
-      <div class="feature-card">
-        <span class="emoji">🔥</span>
-        <h3>Sequência diária</h3>
-        <p>Acompanhe sua sequência de dias estudando e ganhe pontos de experiência (XP).</p>
-      </div>
-      <div class="feature-card">
-        <span class="emoji">🔒</span>
-        <h3>Sua conta, seu progresso</h3>
-        <p>Cadastre-se com e-mail e senha para salvar seu progresso com segurança.</p>
-      </div>
-    </section>
-  </div>
+  <section class="cta-band">
+    <h2>aprenda com o EnglishBite</h2>
+    <a href="signup.html" class="btn">Comece agora</a>
+  </section>
 
   <footer class="site-footer">
-    Criado por <strong>Lucas Fortunato</strong> · EnglishBite é um projeto de estudo independente, com conteúdo original inspirado no formato de programas de inglês. Não é afiliado à BBC.
+    Criado por Lucas Fortunato · EnglishBite é um projeto de estudo independente.
   </footer>
 
   <script src="js/sounds.js"></script>
+  <script>
+    // Quem já está logado vai direto para a trilha
+    if (localStorage.getItem("eb_token")) window.location.replace("home.html");
+  </script>
 </body>
 </html>

@@ -4,21 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Teste de nível — EnglishBite</title>
+<link rel="icon" href="img/bee.svg">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="lesson-header">
-    <span style="width:1px;"></span>
-    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
-    <a href="#" class="btn btn-ghost" id="skipBtn" style="padding:8px 12px; font-size:0.85rem;">Pular</a>
-  </div>
+  <div class="lesson-page">
+    <div class="lesson-header">
+      <a href="home.html" class="icon-btn" aria-label="Fechar">✕</a>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      <a href="#" class="btn btn-ghost btn-sm" id="skipBtn">Pular</a>
+    </div>
 
-  <div class="lesson-body" id="quizBody">
-    <div class="question-card">
-      <span style="font-size:2.4rem;">🎯</span>
-      <h2>Vamos descobrir seu nível</h2>
-      <p style="color:#6b7a76; margin-bottom:20px;">Responda algumas perguntas de inglês. Não se preocupe em errar — é só para te colocar no ponto certo da trilha. Você pode revisar qualquer lição depois, mesmo as mais fáceis.</p>
-      <button class="btn btn-primary btn-block" id="startBtn">Começar teste</button>
+    <div class="lesson-body" id="quizBody">
+      <div class="result-card">
+        <img class="mascot" src="img/bee.svg" alt="">
+        <h2 style="color:var(--title)">Vamos descobrir seu nível!</h2>
+        <p class="sub">Responda algumas perguntas rápidas. Não se preocupe em errar — é só pra te colocar no ponto certo da trilha.</p>
+        <button class="btn btn-block" id="startBtn" style="max-width:330px">Começar teste</button>
+      </div>
     </div>
   </div>
 

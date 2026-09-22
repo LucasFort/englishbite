@@ -3,28 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sua trilha — EnglishBite</title>
+<title>Aprender — EnglishBite</title>
+<link rel="icon" href="img/bee.svg">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="top-bar">
-    <a href="home.html" class="brand"><span class="logo">🐝</span> EnglishBite</a>
-    <div class="stat-pills">
-      <div class="stat-pill">🔥 <span id="streakVal">0</span></div>
-      <div class="stat-pill">⭐ <span id="xpVal">0</span></div>
-    </div>
-    <div class="user-menu">
-      <div class="avatar" id="avatarInitial">?</div>
-      <a href="placement.html" class="btn btn-ghost" style="display:none;" id="retakeBtn">Refazer teste</a>
-      <button class="btn btn-ghost" id="logoutBtn">Sair</button>
+  <div class="app">
+    <nav class="sidebar">
+      <a href="home.html" class="brand"><img src="img/bee.svg" alt=""> englishbite</a>
+      <a href="home.html" class="side-link active"><span class="ico">🏠</span><span class="label">Aprender</span></a>
+      <a href="placement.html" class="side-link"><span class="ico">🎯</span><span class="label">Teste de nível</span></a>
+      <button class="side-link" data-logout><span class="ico">🚪</span><span class="label">Sair</span></button>
+    </nav>
+
+    <div class="main-col">
+      <main class="path-col">
+        <div class="mobile-top">
+          <div class="stats-bar" data-stats></div>
+        </div>
+        <div id="path"><p style="color:var(--muted);text-align:center;padding:40px 0">Carregando sua trilha...</p></div>
+      </main>
+
+      <aside class="right-col">
+        <div class="stats-bar" data-stats></div>
+        <div class="card">
+          <h3>Seu progresso</h3>
+          <div class="row">
+            <span style="font-size:1.8rem">🏆</span>
+            <div style="flex:1">
+              <p id="progressText" style="margin-bottom:8px">—</p>
+              <div class="mini-track"><div class="mini-fill" id="progressFill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <img src="img/bee.svg" alt="" style="width:64px">
+            <div>
+              <h3 style="margin-bottom:4px" id="helloName">Olá!</h3>
+              <p id="helloText">Faça uma lição hoje para manter sua ofensiva.</p>
+            </div>
+          </div>
+        </div>
+        <footer class="site-footer" style="padding:0">Criado por Lucas Fortunato</footer>
+      </aside>
     </div>
   </div>
 
-  <div class="path" id="path">
-    <p style="color:#6b7a76">Carregando sua trilha...</p>
-  </div>
+  <nav class="bottom-nav">
+    <a href="home.html" class="side-link active"><span class="ico">🏠</span><span class="label">Aprender</span></a>
+    <a href="placement.html" class="side-link"><span class="ico">🎯</span><span class="label">Teste</span></a>
+    <button class="side-link" data-logout><span class="ico">🚪</span><span class="label">Sair</span></button>
+  </nav>
 
-  <footer class="site-footer">Criado por <strong>Lucas Fortunato</strong></footer>
+  <div class="modal-backdrop" id="guideModal">
+    <div class="modal">
+      <button class="icon-btn close" id="guideClose" aria-label="Fechar">✕</button>
+      <div id="guideBody"></div>
+    </div>
+  </div>
 
   <script src="js/sounds.js"></script>
   <script src="js/api.js"></script>

@@ -4,25 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lição — EnglishBite</title>
+<link rel="icon" href="img/bee.svg">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="lesson-header">
-    <a href="home.html" class="btn btn-ghost" style="padding:8px 12px;">✕</a>
-    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
-    <div class="hearts" id="heartsBox">❤️❤️❤️</div>
-  </div>
-
-  <div class="lesson-body" id="lessonBody">
-    <p style="color:#6b7a76">Carregando lição...</p>
-  </div>
-
-  <div class="feedback-banner" id="feedbackBanner">
-    <div>
-      <div class="feedback-text" id="feedbackText"></div>
-      <div id="feedbackExplanation" style="color:#6b7a76; font-size:0.85rem;"></div>
+  <div class="lesson-page">
+    <div class="lesson-header">
+      <button class="icon-btn" id="quitBtn" aria-label="Sair da lição">✕</button>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="hearts" id="heartsBox"><span class="ico">❤️</span><span id="heartsVal">5</span></div>
     </div>
-    <button class="btn btn-primary" id="continueBtn">Continuar</button>
+
+    <div class="lesson-body" id="lessonBody">
+      <p style="color:var(--muted)">Carregando lição...</p>
+    </div>
+  </div>
+
+  <div class="lesson-footer" id="footer">
+    <div class="inner">
+      <button class="btn btn-white skip-btn" id="skipBtn" style="visibility:hidden">Pular</button>
+      <div class="feedback">
+        <div class="badge" id="fbBadge">✓</div>
+        <div>
+          <div class="title" id="fbTitle"></div>
+          <div class="detail" id="fbDetail"></div>
+        </div>
+      </div>
+      <button class="btn" id="mainBtn" disabled>Verificar</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="quitModal">
+    <div class="modal" style="text-align:center;max-width:420px;margin-top:15vh">
+      <img src="img/bee.svg" alt="" style="width:110px">
+      <h2>Espera, não vá embora!</h2>
+      <p style="color:var(--muted);font-weight:600;margin:0 0 24px">Se sair agora, você vai perder o progresso desta lição.</p>
+      <button class="btn btn-blue btn-block" id="stayBtn">Continuar aprendendo</button>
+      <a class="btn btn-ghost btn-block" href="home.html" style="--btn-fg:var(--red);margin-top:8px">Sair da lição</a>
+    </div>
   </div>
 
   <script src="js/sounds.js"></script>
