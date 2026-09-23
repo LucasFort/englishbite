@@ -1,178 +1,530 @@
 [
   {
     "id": "greetings",
-    "title": "Saudações e Apresentações",
-    "icon": "👋",
     "level": "A1",
-    "tip": "Em inglês, a forma de cumprimentar muda com a hora do dia e o grau de formalidade. 'Hi' e 'Hello' funcionam a qualquer hora; 'Good morning/afternoon/evening' são mais formais.",
-    "vocabulary": [
-      { "word": "Hello / Hi", "meaning": "Olá / Oi", "example": "Hi! My name is Ana." },
-      { "word": "Good morning", "meaning": "Bom dia", "example": "Good morning, everyone!" },
-      { "word": "Nice to meet you", "meaning": "Prazer em conhecê-lo(a)", "example": "Nice to meet you, John." },
-      { "word": "How are you?", "meaning": "Como você está?", "example": "Hi Sarah, how are you today?" },
-      { "word": "I'm fine, thanks", "meaning": "Estou bem, obrigado(a)", "example": "I'm fine, thanks. And you?" },
-      { "word": "See you later", "meaning": "Até mais", "example": "I have to go now. See you later!" }
+    "title": "Saudações",
+    "icon": "👋",
+    "tip": "'Hello' serve para qualquer hora. 'Good morning' é bom dia e 'Good night' é boa noite só na despedida — para chegar à noite, diga 'Good evening'.",
+    "words": [
+      { "en": "Hello", "pt": "Olá", "ex": "Hello, Anna!", "exPt": "Olá, Anna!" },
+      { "en": "Good morning", "pt": "Bom dia", "ex": "Good morning, everyone!", "exPt": "Bom dia, pessoal!" },
+      { "en": "Good night", "pt": "Boa noite (na despedida)", "ex": "Good night, see you tomorrow.", "exPt": "Boa noite, até amanhã." },
+      { "en": "How are you?", "pt": "Como você está?", "ex": "Hi Tom, how are you?", "exPt": "Oi Tom, como você está?" },
+      { "en": "I'm fine, thank you", "pt": "Estou bem, obrigado", "ex": "I'm fine, thank you. And you?", "exPt": "Estou bem, obrigado. E você?" },
+      { "en": "Nice to meet you", "pt": "Prazer em conhecer você", "ex": "Nice to meet you, Maria.", "exPt": "Prazer em conhecer você, Maria." },
+      { "en": "See you later", "pt": "Até mais tarde", "ex": "I have to go. See you later!", "exPt": "Eu preciso ir. Até mais tarde!" },
+      { "en": "Goodbye", "pt": "Tchau", "ex": "Goodbye, and thank you!", "exPt": "Tchau, e obrigado!" }
     ],
     "quiz": [
-      { "question": "Como se diz 'Prazer em conhecê-lo' em inglês?", "options": ["See you later", "Nice to meet you", "Good morning", "How are you?"], "answer": 1, "explanation": "'Nice to meet you' é usado quando conhecemos alguém pela primeira vez." },
-      { "question": "Qual cumprimento é mais formal?", "options": ["Hi", "Hey", "Good afternoon", "Yo"], "answer": 2, "explanation": "'Good afternoon' é usado em contextos mais formais, como no trabalho." },
-      { "question": "Complete: 'Hi Tom, ___ are you?'", "options": ["what", "how", "who", "where"], "answer": 1, "explanation": "A pergunta correta sobre o estado de alguém é 'How are you?'." },
-      { "question": "O que significa 'I'm fine, thanks'?", "options": ["Eu sou fino, obrigado", "Estou bem, obrigado", "Eu termino, obrigado", "Estou multado, obrigado"], "answer": 1, "explanation": "É a resposta comum e educada para 'How are you?'." },
-      { "question": "Como você se despede de forma casual?", "options": ["Nice to meet you", "Good evening", "See you later", "How are you?"], "answer": 2, "explanation": "'See you later' é uma despedida informal e comum." }
-    ]
+      { "question": "Você chega numa festa às 21h. Como cumprimenta?", "options": ["Good night", "Good evening", "Goodbye", "See you later"], "answer": 1, "explanation": "'Good evening' é usado para cumprimentar à noite. 'Good night' é só para se despedir." },
+      { "question": "Complete: 'Hi Tom, ___ are you?'", "options": ["what", "how", "who", "where"], "answer": 1, "explanation": "A pergunta é 'How are you?' — 'Como você está?'." },
+      { "question": "Qual é a resposta mais comum para 'How are you?'", "options": ["Nice to meet you", "I'm fine, thank you", "Goodbye", "Good morning"], "answer": 1, "explanation": "'I'm fine, thank you' = 'Estou bem, obrigado'." },
+      { "question": "O que você diz ao conhecer alguém?", "options": ["See you later", "Good night", "Nice to meet you", "How old are you?"], "answer": 2, "explanation": "'Nice to meet you' = 'Prazer em conhecer você'." }
+    ],
+    "call": {
+      "title": "Primeira conversa com a Bibi",
+      "lines": [
+        { "bibi": "Hi! I'm Bibi. What's your name?", "bibiPt": "Oi! Eu sou a Bibi. Qual é o seu nome?", "model": "My name is Lucas.", "hintPt": "Diga seu nome: 'My name is ...'", "accept": ["my name is", "i'm", "i am", "name"] },
+        { "bibi": "Nice to meet you! How are you today?", "bibiPt": "Prazer em conhecer você! Como você está hoje?", "model": "I'm fine, thank you. And you?", "hintPt": "Diga que está bem e pergunte de volta.", "accept": ["fine", "good", "great", "well", "okay", "ok"] },
+        { "bibi": "I'm great, thanks! I have to go now. See you later!", "bibiPt": "Estou ótima, obrigada! Preciso ir agora. Até mais tarde!", "model": "See you later! Goodbye!", "hintPt": "Despeça-se da Bibi.", "accept": ["see you", "goodbye", "bye"] }
+      ],
+      "end": "Bye! You did a great job!",
+      "endPt": "Tchau! Você mandou muito bem!"
+    }
+  },
+  {
+    "id": "introductions",
+    "level": "A1",
+    "title": "Apresentações",
+    "icon": "🙋",
+    "tip": "Para dizer a idade em inglês usamos o verbo 'to be' (ser/estar), não 'to have': 'I am twenty years old' — literalmente 'Eu sou vinte anos velho'.",
+    "words": [
+      { "en": "What's your name?", "pt": "Qual é o seu nome?", "ex": "Hi! What's your name?", "exPt": "Oi! Qual é o seu nome?" },
+      { "en": "My name is Ana", "pt": "Meu nome é Ana", "ex": "Hello, my name is Ana.", "exPt": "Olá, meu nome é Ana." },
+      { "en": "Where are you from?", "pt": "De onde você é?", "ex": "Where are you from, Tom?", "exPt": "De onde você é, Tom?" },
+      { "en": "I'm from Brazil", "pt": "Eu sou do Brasil", "ex": "I'm from Brazil. And you?", "exPt": "Eu sou do Brasil. E você?" },
+      { "en": "How old are you?", "pt": "Quantos anos você tem?", "ex": "How old are you, Lucas?", "exPt": "Quantos anos você tem, Lucas?" },
+      { "en": "I'm twenty years old", "pt": "Eu tenho vinte anos", "ex": "I'm twenty years old and I live in Recife.", "exPt": "Eu tenho vinte anos e moro em Recife." },
+      { "en": "What do you do?", "pt": "O que você faz? (profissão)", "ex": "So, what do you do?", "exPt": "Então, o que você faz?" },
+      { "en": "I'm a student", "pt": "Eu sou estudante", "ex": "I'm a student at a big school.", "exPt": "Eu sou estudante em uma escola grande." }
+    ],
+    "quiz": [
+      { "question": "Como dizer 'Eu tenho 25 anos'?", "options": ["I have 25 years", "I'm 25 years old", "I have 25 years old", "I'm 25 years"], "answer": 1, "explanation": "Idade usa o verbo 'to be': 'I'm 25 years old'." },
+      { "question": "Complete: 'Where ___ you from?'", "options": ["is", "am", "are", "do"], "answer": 2, "explanation": "Com 'you' usamos 'are': 'Where are you from?'." },
+      { "question": "'What do you do?' pergunta sobre:", "options": ["o que você está fazendo agora", "a sua profissão", "o seu nome", "a sua idade"], "answer": 1, "explanation": "'What do you do?' é a forma comum de perguntar a profissão." },
+      { "question": "Complete: 'I'm ___ student.'", "options": ["a", "an", "the", "—"], "answer": 0, "explanation": "Antes de profissões usamos 'a' ou 'an': 'I'm a student'." }
+    ],
+    "call": {
+      "title": "Conhecendo a Bibi",
+      "lines": [
+        { "bibi": "Hello! What's your name?", "bibiPt": "Olá! Qual é o seu nome?", "model": "My name is Lucas.", "hintPt": "Diga: 'My name is ...'", "accept": ["my name is", "i'm", "i am", "name"] },
+        { "bibi": "Cool! Where are you from?", "bibiPt": "Legal! De onde você é?", "model": "I'm from Brazil.", "hintPt": "Diga de onde você é: 'I'm from ...'", "accept": ["from", "brazil", "i'm", "i am"] },
+        { "bibi": "Brazil is beautiful! And what do you do?", "bibiPt": "O Brasil é lindo! E o que você faz?", "model": "I'm a student.", "hintPt": "Diga sua profissão: 'I'm a ...'", "accept": ["student", "i'm a", "i am a", "i'm an", "i work", "work"] }
+      ],
+      "end": "Nice to meet you! Talk to you soon!",
+      "endPt": "Prazer em te conhecer! Até logo!"
+    }
+  },
+  {
+    "id": "numbers-time",
+    "level": "A1",
+    "title": "Números e Horas",
+    "icon": "🕒",
+    "tip": "Para dizer a hora exata use 'o'clock': 'It's three o'clock'. Para 'e meia' use 'half past': 'half past seven' = sete e meia.",
+    "words": [
+      { "en": "ten", "pt": "dez", "ex": "I have ten books.", "exPt": "Eu tenho dez livros." },
+      { "en": "twenty", "pt": "vinte", "ex": "There are twenty students in the class.", "exPt": "Há vinte alunos na turma." },
+      { "en": "one hundred", "pt": "cem", "ex": "The ticket costs one hundred dollars.", "exPt": "A passagem custa cem dólares." },
+      { "en": "What time is it?", "pt": "Que horas são?", "ex": "Excuse me, what time is it?", "exPt": "Com licença, que horas são?" },
+      { "en": "It's three o'clock", "pt": "São três horas", "ex": "It's three o'clock in the afternoon.", "exPt": "São três horas da tarde." },
+      { "en": "half past seven", "pt": "sete e meia", "ex": "The movie starts at half past seven.", "exPt": "O filme começa às sete e meia." },
+      { "en": "today", "pt": "hoje", "ex": "Today is Monday.", "exPt": "Hoje é segunda-feira." },
+      { "en": "tomorrow", "pt": "amanhã", "ex": "See you tomorrow!", "exPt": "Até amanhã!" }
+    ],
+    "quiz": [
+      { "question": "Como se diz 'São cinco horas'?", "options": ["It's five hours", "It's five o'clock", "Are five hours", "It five o'clock"], "answer": 1, "explanation": "Para horas exatas: 'It's ... o'clock'." },
+      { "question": "O que significa 'half past nine'?", "options": ["nove e meia", "meia-noite", "oito e meia", "nove horas"], "answer": 0, "explanation": "'Half past nine' = metade depois das nove = 9:30." },
+      { "question": "Qual número é 'one hundred'?", "options": ["10", "100", "1.000", "110"], "answer": 1, "explanation": "'One hundred' = cem." },
+      { "question": "O que é 'tomorrow'?", "options": ["ontem", "hoje", "amanhã", "agora"], "answer": 2, "explanation": "'Tomorrow' = amanhã. 'Today' = hoje. 'Yesterday' = ontem." }
+    ],
+    "call": {
+      "title": "Marcando um encontro",
+      "lines": [
+        { "bibi": "Hi! Quick question: what time is it?", "bibiPt": "Oi! Pergunta rápida: que horas são?", "model": "It's three o'clock.", "hintPt": "Diga a hora: 'It's ... o'clock'.", "accept": ["it's", "it is", "o'clock", "half past"] },
+        { "bibi": "Thanks! Are you free tomorrow?", "bibiPt": "Obrigada! Você está livre amanhã?", "model": "Yes, I'm free tomorrow.", "hintPt": "Responda sim ou não: 'Yes, I'm free' / 'No, I'm not'.", "accept": ["yes", "no", "free", "tomorrow", "i'm not"] },
+        { "bibi": "Great! Let's study English at half past seven. Okay?", "bibiPt": "Ótimo! Vamos estudar inglês às sete e meia. Pode ser?", "model": "Okay! See you tomorrow!", "hintPt": "Concorde e se despeça.", "accept": ["okay", "ok", "yes", "sure", "see you", "tomorrow"] }
+      ],
+      "end": "Perfect! See you tomorrow!",
+      "endPt": "Perfeito! Até amanhã!"
+    }
+  },
+  {
+    "id": "family",
+    "level": "A1",
+    "title": "Família",
+    "icon": "👨‍👩‍👧",
+    "tip": "Para falar de algo que pertence a alguém usamos 's: 'my mother's name' = o nome da minha mãe.",
+    "words": [
+      { "en": "mother", "pt": "mãe", "ex": "My mother is a teacher.", "exPt": "Minha mãe é professora." },
+      { "en": "father", "pt": "pai", "ex": "My father works at a bank.", "exPt": "Meu pai trabalha em um banco." },
+      { "en": "brother", "pt": "irmão", "ex": "I have one brother.", "exPt": "Eu tenho um irmão." },
+      { "en": "sister", "pt": "irmã", "ex": "My sister is ten years old.", "exPt": "Minha irmã tem dez anos." },
+      { "en": "grandmother", "pt": "avó", "ex": "My grandmother lives with us.", "exPt": "Minha avó mora com a gente." },
+      { "en": "son", "pt": "filho", "ex": "Their son is a doctor.", "exPt": "O filho deles é médico." },
+      { "en": "daughter", "pt": "filha", "ex": "She has a little daughter.", "exPt": "Ela tem uma filha pequena." },
+      { "en": "I have two brothers", "pt": "Eu tenho dois irmãos", "ex": "I have two brothers and one sister.", "exPt": "Eu tenho dois irmãos e uma irmã." }
+    ],
+    "quiz": [
+      { "question": "Como se diz 'o nome da minha mãe'?", "options": ["my mother name", "my mother's name", "the name my mother", "my name's mother"], "answer": 1, "explanation": "Usamos 's para posse: 'my mother's name'." },
+      { "question": "O que é 'grandmother'?", "options": ["avô", "avó", "tia", "mãe"], "answer": 1, "explanation": "'Grandmother' = avó. 'Grandfather' = avô." },
+      { "question": "Complete: 'She ___ two sisters.'", "options": ["have", "has", "is", "are"], "answer": 1, "explanation": "Com 'she', 'he' e 'it', 'have' vira 'has'." },
+      { "question": "'Daughter' significa:", "options": ["filho", "filha", "irmã", "neta"], "answer": 1, "explanation": "'Daughter' = filha. 'Son' = filho." }
+    ],
+    "call": {
+      "title": "Falando da sua família",
+      "lines": [
+        { "bibi": "Tell me about your family. Do you have brothers or sisters?", "bibiPt": "Me conte da sua família. Você tem irmãos ou irmãs?", "model": "Yes, I have one brother.", "hintPt": "Diga quantos irmãos você tem: 'I have ...'", "accept": ["i have", "brother", "sister", "yes", "no", "only child"] },
+        { "bibi": "Nice! What's your mother's name?", "bibiPt": "Legal! Qual é o nome da sua mãe?", "model": "My mother's name is Maria.", "hintPt": "Diga: 'My mother's name is ...'", "accept": ["mother", "name is", "her name", "mom", "mum"] },
+        { "bibi": "Beautiful name! Do you live with your family?", "bibiPt": "Nome lindo! Você mora com a sua família?", "model": "Yes, I live with my family.", "hintPt": "Responda: 'Yes, I live with...' / 'No, I don't'.", "accept": ["yes", "no", "live", "don't"] }
+      ],
+      "end": "Thanks for telling me about your family!",
+      "endPt": "Obrigada por me contar sobre a sua família!"
+    }
+  },
+  {
+    "id": "food",
+    "level": "A1",
+    "title": "Comida e Bebida",
+    "icon": "🍎",
+    "tip": "'I'd like' (I would like) é o jeito educado de pedir algo: 'I'd like a coffee, please'. É mais gentil do que 'I want'.",
+    "words": [
+      { "en": "water", "pt": "água", "ex": "Can I have some water?", "exPt": "Posso tomar um pouco de água?" },
+      { "en": "coffee", "pt": "café", "ex": "I drink coffee every morning.", "exPt": "Eu tomo café toda manhã." },
+      { "en": "bread", "pt": "pão", "ex": "We eat bread for breakfast.", "exPt": "Nós comemos pão no café da manhã." },
+      { "en": "chicken", "pt": "frango", "ex": "I'd like chicken and rice.", "exPt": "Eu gostaria de frango com arroz." },
+      { "en": "I'm hungry", "pt": "Estou com fome", "ex": "I'm hungry. Let's eat!", "exPt": "Estou com fome. Vamos comer!" },
+      { "en": "I'm thirsty", "pt": "Estou com sede", "ex": "I'm thirsty. Is there any juice?", "exPt": "Estou com sede. Tem suco?" },
+      { "en": "I like pizza", "pt": "Eu gosto de pizza", "ex": "I like pizza, but I don't like fish.", "exPt": "Eu gosto de pizza, mas não gosto de peixe." },
+      { "en": "The check, please", "pt": "A conta, por favor", "ex": "Excuse me, the check, please.", "exPt": "Com licença, a conta, por favor." }
+    ],
+    "quiz": [
+      { "question": "Qual é o jeito mais educado de pedir?", "options": ["I want a coffee.", "Give me a coffee.", "I'd like a coffee, please.", "Coffee now."], "answer": 2, "explanation": "'I'd like..., please' é a forma educada." },
+      { "question": "'I'm hungry' significa:", "options": ["Estou com sede", "Estou com fome", "Estou cansado", "Estou com frio"], "answer": 1, "explanation": "'Hungry' = com fome. 'Thirsty' = com sede." },
+      { "question": "Complete: 'I ___ like fish.' (não gosto)", "options": ["not", "don't", "doesn't", "no"], "answer": 1, "explanation": "A negativa com 'I' usa 'don't': 'I don't like fish'." },
+      { "question": "Como pedir a conta no restaurante?", "options": ["The menu, please.", "The check, please.", "The food, please.", "The table, please."], "answer": 1, "explanation": "'The check, please' (ou 'the bill') = a conta, por favor." }
+    ],
+    "call": {
+      "title": "No restaurante",
+      "lines": [
+        { "bibi": "Hi, welcome! What would you like to drink?", "bibiPt": "Oi, seja bem-vindo! O que você gostaria de beber?", "model": "I'd like water, please.", "hintPt": "Peça uma bebida: 'I'd like ..., please'.", "accept": ["water", "coffee", "juice", "soda", "please", "i'd like", "i would like"] },
+        { "bibi": "Sure. And what would you like to eat?", "bibiPt": "Claro. E o que você gostaria de comer?", "model": "I'd like chicken, please.", "hintPt": "Peça uma comida: 'I'd like ..., please'.", "accept": ["chicken", "pizza", "bread", "rice", "salad", "i'd like", "i would like", "please"] },
+        { "bibi": "Here you go. Anything else?", "bibiPt": "Aqui está. Mais alguma coisa?", "model": "No, thank you. The check, please.", "hintPt": "Diga que não e peça a conta.", "accept": ["no", "thank", "check", "bill"] }
+      ],
+      "end": "Thank you! Have a nice day!",
+      "endPt": "Obrigada! Tenha um bom dia!"
+    }
   },
   {
     "id": "daily-routine",
+    "level": "A1",
     "title": "Rotina Diária",
     "icon": "☀️",
-    "level": "A1",
-    "tip": "Para falar de hábitos e rotina, usamos o Present Simple. Não esqueça o 's' na terceira pessoa: 'She wakes up at 7am.'",
-    "vocabulary": [
-      { "word": "wake up", "meaning": "acordar", "example": "I wake up at 6:30am every day." },
-      { "word": "have breakfast", "meaning": "tomar café da manhã", "example": "We have breakfast together." },
-      { "word": "go to work", "meaning": "ir trabalhar", "example": "He goes to work by bus." },
-      { "word": "get home", "meaning": "chegar em casa", "example": "I usually get home at 6pm." },
-      { "word": "have dinner", "meaning": "jantar", "example": "They have dinner at 8pm." },
-      { "word": "go to bed", "meaning": "ir dormir", "example": "She goes to bed early on weekdays." }
+    "tip": "Para rotina usamos o Present Simple. Com he, she e it, o verbo ganha 's': 'She wakes up at seven'.",
+    "words": [
+      { "en": "wake up", "pt": "acordar", "ex": "I wake up at seven.", "exPt": "Eu acordo às sete." },
+      { "en": "take a shower", "pt": "tomar banho", "ex": "I take a shower in the morning.", "exPt": "Eu tomo banho de manhã." },
+      { "en": "have breakfast", "pt": "tomar café da manhã", "ex": "We have breakfast together.", "exPt": "Nós tomamos café da manhã juntos." },
+      { "en": "go to work", "pt": "ir trabalhar", "ex": "He goes to work by bus.", "exPt": "Ele vai trabalhar de ônibus." },
+      { "en": "have lunch", "pt": "almoçar", "ex": "I have lunch at noon.", "exPt": "Eu almoço ao meio-dia." },
+      { "en": "get home", "pt": "chegar em casa", "ex": "I usually get home at six.", "exPt": "Eu geralmente chego em casa às seis." },
+      { "en": "have dinner", "pt": "jantar", "ex": "They have dinner at eight.", "exPt": "Eles jantam às oito." },
+      { "en": "go to bed", "pt": "ir dormir", "ex": "She goes to bed early.", "exPt": "Ela vai dormir cedo." }
     ],
     "quiz": [
-      { "question": "Complete: 'She ___ up at 7am.' (wake)", "options": ["wake", "wakes", "waking", "woke"], "answer": 1, "explanation": "Na terceira pessoa do Present Simple, acrescentamos 's': 'wakes'." },
-      { "question": "O que significa 'go to work'?", "options": ["ir para casa", "ir trabalhar", "ir dormir", "ir comer"], "answer": 1, "explanation": "'Go to work' significa 'ir trabalhar'." },
-      { "question": "Qual frase está correta?", "options": ["He go to work at 8am.", "He goes to work at 8am.", "He going to work at 8am.", "He gone to work at 8am."], "answer": 1, "explanation": "A forma correta na terceira pessoa é 'goes'." },
-      { "question": "Complete: 'We usually ___ dinner at home.'", "options": ["has", "having", "have", "had"], "answer": 2, "explanation": "Com 'We' (não é terceira pessoa do singular), usamos 'have'." },
-      { "question": "Como se diz 'chegar em casa'?", "options": ["go to bed", "get home", "wake up", "have breakfast"], "answer": 1, "explanation": "'Get home' significa 'chegar em casa'." }
-    ]
+      { "question": "Complete: 'She ___ up at 7am.'", "options": ["wake", "wakes", "waking", "woke"], "answer": 1, "explanation": "Com 'she', o verbo ganha 's': 'wakes'." },
+      { "question": "Qual frase está correta?", "options": ["He go to work at 8.", "He goes to work at 8.", "He going to work at 8.", "He gone to work at 8."], "answer": 1, "explanation": "Na 3ª pessoa: 'He goes'." },
+      { "question": "Complete: 'We usually ___ dinner at home.'", "options": ["has", "having", "have", "had"], "answer": 2, "explanation": "Com 'we' usamos 'have' (sem 's')." },
+      { "question": "O que significa 'get home'?", "options": ["sair de casa", "chegar em casa", "limpar a casa", "ficar em casa"], "answer": 1, "explanation": "'Get home' = chegar em casa." }
+    ],
+    "call": {
+      "title": "Sua rotina",
+      "lines": [
+        { "bibi": "Good morning! What time do you wake up?", "bibiPt": "Bom dia! Que horas você acorda?", "model": "I wake up at seven.", "hintPt": "Diga: 'I wake up at ...'", "accept": ["wake up", "i wake", "o'clock", "at"] },
+        { "bibi": "And what do you have for breakfast?", "bibiPt": "E o que você come no café da manhã?", "model": "I have bread and coffee.", "hintPt": "Diga o que você come: 'I have ...'", "accept": ["have", "eat", "coffee", "bread", "breakfast", "fruit", "milk"] },
+        { "bibi": "Yummy! What time do you go to bed?", "bibiPt": "Delícia! Que horas você vai dormir?", "model": "I go to bed at eleven.", "hintPt": "Diga: 'I go to bed at ...'", "accept": ["go to bed", "i go", "sleep", "at"] }
+      ],
+      "end": "Great routine! Have a nice day!",
+      "endPt": "Ótima rotina! Tenha um bom dia!"
+    }
   },
   {
-    "id": "phrasal-verbs",
-    "title": "Phrasal Verbs do Dia a Dia",
-    "icon": "🔗",
+    "id": "shopping",
     "level": "A2",
-    "tip": "Phrasal verbs são combinações de verbo + preposição/advérbio que mudam o significado original. Ex: 'look' (olhar) + 'for' = 'look for' (procurar).",
-    "vocabulary": [
-      { "word": "look for", "meaning": "procurar", "example": "I'm looking for my keys." },
-      { "word": "give up", "meaning": "desistir", "example": "Don't give up on your dreams." },
-      { "word": "find out", "meaning": "descobrir", "example": "I need to find out what happened." },
-      { "word": "turn off", "meaning": "desligar", "example": "Can you turn off the lights?" },
-      { "word": "get up", "meaning": "levantar-se", "example": "I get up early on weekdays." },
-      { "word": "come back", "meaning": "voltar", "example": "She will come back tomorrow." }
+    "title": "Compras",
+    "icon": "🛍️",
+    "tip": "'This' é para algo perto de você e 'that' para algo mais longe: 'How much is this?' (isto aqui) / 'How much is that?' (aquilo ali).",
+    "words": [
+      { "en": "How much is this?", "pt": "Quanto custa isto?", "ex": "Excuse me, how much is this?", "exPt": "Com licença, quanto custa isto?" },
+      { "en": "It's too expensive", "pt": "É caro demais", "ex": "I like it, but it's too expensive.", "exPt": "Eu gosto, mas é caro demais." },
+      { "en": "cheap", "pt": "barato", "ex": "This shirt is very cheap.", "exPt": "Esta camisa é muito barata." },
+      { "en": "Can I try it on?", "pt": "Posso experimentar?", "ex": "I like this jacket. Can I try it on?", "exPt": "Eu gosto desta jaqueta. Posso experimentar?" },
+      { "en": "What size?", "pt": "Qual tamanho?", "ex": "What size do you need?", "exPt": "De que tamanho você precisa?" },
+      { "en": "I'm just looking", "pt": "Só estou olhando", "ex": "No, thanks. I'm just looking.", "exPt": "Não, obrigado. Só estou olhando." },
+      { "en": "Do you take credit cards?", "pt": "Vocês aceitam cartão de crédito?", "ex": "Do you take credit cards here?", "exPt": "Vocês aceitam cartão de crédito aqui?" },
+      { "en": "receipt", "pt": "recibo", "ex": "Can I have the receipt, please?", "exPt": "Pode me dar o recibo, por favor?" }
     ],
     "quiz": [
-      { "question": "O que significa 'give up'?", "options": ["continuar", "desistir", "subir", "entregar"], "answer": 1, "explanation": "'Give up' significa desistir de algo." },
-      { "question": "Complete: 'I'm ___ my phone. Have you seen it?'", "options": ["looking for", "giving up", "turning off", "coming back"], "answer": 0, "explanation": "'Look for' é usado quando procuramos algo." },
-      { "question": "Qual phrasal verb significa 'descobrir'?", "options": ["turn off", "find out", "get up", "give up"], "answer": 1, "explanation": "'Find out' é usado quando descobrimos uma informação." },
-      { "question": "'Please, ___ the TV before you sleep.'", "options": ["find out", "look for", "turn off", "come back"], "answer": 2, "explanation": "'Turn off' significa desligar um aparelho." },
-      { "question": "O que significa 'come back'?", "options": ["voltar", "ir embora", "acordar", "procurar"], "answer": 0, "explanation": "'Come back' significa retornar a um lugar." }
-    ]
+      { "question": "O vendedor pergunta 'Can I help you?' e você só quer ver. O que diz?", "options": ["I'm just looking, thanks.", "It's too expensive.", "Can I try it on?", "What size?"], "answer": 0, "explanation": "'I'm just looking' = só estou olhando." },
+      { "question": "O contrário de 'expensive' é:", "options": ["big", "cheap", "small", "new"], "answer": 1, "explanation": "'Expensive' = caro; 'cheap' = barato." },
+      { "question": "Complete: 'How much ___ these shoes?'", "options": ["is", "are", "am", "be"], "answer": 1, "explanation": "'Shoes' é plural, então usamos 'are'." },
+      { "question": "Como perguntar se pode experimentar uma roupa?", "options": ["Can I try it on?", "Can I buy it?", "Can I pay it?", "Can I size it?"], "answer": 0, "explanation": "'Try on' = experimentar (roupas)." }
+    ],
+    "call": {
+      "title": "Na loja de roupas",
+      "lines": [
+        { "bibi": "Hi! Can I help you?", "bibiPt": "Oi! Posso te ajudar?", "model": "Yes, please. How much is this jacket?", "hintPt": "Pergunte o preço: 'How much is this ...?'", "accept": ["how much", "yes", "just looking", "price"] },
+        { "bibi": "It's fifty dollars. What size do you need?", "bibiPt": "Custa cinquenta dólares. De que tamanho você precisa?", "model": "Medium, please. Can I try it on?", "hintPt": "Diga o tamanho (small, medium, large) e peça para experimentar.", "accept": ["small", "medium", "large", "size", "try", "please"] },
+        { "bibi": "Of course! It looks great on you. Do you want it?", "bibiPt": "Claro! Ficou ótima em você. Você quer levar?", "model": "Yes! Do you take credit cards?", "hintPt": "Diga que sim e pergunte sobre o cartão.", "accept": ["yes", "credit card", "card", "no", "take it"] }
+      ],
+      "end": "Yes, we do! Thank you for shopping with us!",
+      "endPt": "Aceitamos, sim! Obrigada por comprar com a gente!"
+    }
   },
   {
     "id": "travel",
-    "title": "Inglês para Viagem",
-    "icon": "✈️",
     "level": "A2",
-    "tip": "Saber frases-chave de viagem ajuda muito em aeroportos, hotéis e restaurantes. Praticar essas frases dá mais confiança na hora de viajar.",
-    "vocabulary": [
-      { "word": "Where is the check-in?", "meaning": "Onde é o check-in?", "example": "Excuse me, where is the check-in for this flight?" },
-      { "word": "I'd like to book a room", "meaning": "Eu gostaria de reservar um quarto", "example": "I'd like to book a room for two nights." },
-      { "word": "How much does it cost?", "meaning": "Quanto custa?", "example": "How much does it cost to get to the airport?" },
-      { "word": "Could I have the menu, please?", "meaning": "Poderia me trazer o cardápio, por favor?", "example": "Could I have the menu, please?" },
-      { "word": "I'm lost", "meaning": "Estou perdido(a)", "example": "Excuse me, I'm lost. Can you help me?" },
-      { "word": "boarding pass", "meaning": "cartão de embarque", "example": "Please show your boarding pass here." }
+    "title": "Viagem",
+    "icon": "✈️",
+    "tip": "Para pedir informações, comece com 'Excuse me' (com licença). Para direções: 'turn left' (vire à esquerda), 'turn right' (vire à direita), 'go straight ahead' (siga em frente).",
+    "words": [
+      { "en": "passport", "pt": "passaporte", "ex": "Can I see your passport, please?", "exPt": "Posso ver seu passaporte, por favor?" },
+      { "en": "boarding pass", "pt": "cartão de embarque", "ex": "Please show your boarding pass.", "exPt": "Por favor, mostre seu cartão de embarque." },
+      { "en": "flight", "pt": "voo", "ex": "Our flight leaves at nine.", "exPt": "Nosso voo sai às nove." },
+      { "en": "Where is the bathroom?", "pt": "Onde fica o banheiro?", "ex": "Excuse me, where is the bathroom?", "exPt": "Com licença, onde fica o banheiro?" },
+      { "en": "I'd like to book a room", "pt": "Eu gostaria de reservar um quarto", "ex": "I'd like to book a room for two nights.", "exPt": "Eu gostaria de reservar um quarto por duas noites." },
+      { "en": "I'm lost", "pt": "Estou perdido", "ex": "Excuse me, I'm lost. Can you help me?", "exPt": "Com licença, estou perdido. Você pode me ajudar?" },
+      { "en": "turn left", "pt": "vire à esquerda", "ex": "Turn left at the bank.", "exPt": "Vire à esquerda no banco." },
+      { "en": "go straight ahead", "pt": "siga em frente", "ex": "Go straight ahead for two blocks.", "exPt": "Siga em frente por dois quarteirões." }
     ],
     "quiz": [
-      { "question": "Como perguntar o preço de algo?", "options": ["Where is it?", "How much does it cost?", "What time is it?", "Who are you?"], "answer": 1, "explanation": "'How much does it cost?' é a forma correta de perguntar o preço." },
-      { "question": "O que significa 'boarding pass'?", "options": ["passaporte", "cartão de embarque", "mala", "bilhete de trem"], "answer": 1, "explanation": "'Boarding pass' é o documento necessário para embarcar no avião." },
-      { "question": "Como pedir o cardápio educadamente?", "options": ["Give me the menu!", "Could I have the menu, please?", "Menu now.", "I want food."], "answer": 1, "explanation": "'Could I have... please?' é uma forma educada de pedir algo." },
-      { "question": "'I'd like to book a room' significa:", "options": ["Eu quero cancelar um quarto", "Eu gostaria de reservar um quarto", "Eu tenho um quarto", "Eu perdi meu quarto"], "answer": 1, "explanation": "É usado para fazer uma reserva de hotel." },
-      { "question": "O que dizer se você está perdido?", "options": ["I'm lost", "I'm tired", "I'm hungry", "I'm late"], "answer": 0, "explanation": "'I'm lost' significa 'estou perdido(a)'." }
-    ]
+      { "question": "O que significa 'boarding pass'?", "options": ["passaporte", "cartão de embarque", "mala", "passagem de trem"], "answer": 1, "explanation": "'Boarding pass' é o documento para embarcar no avião." },
+      { "question": "Como pedir ajuda educadamente na rua?", "options": ["Hey! Help!", "Excuse me, can you help me?", "Help me now.", "You help me?"], "answer": 1, "explanation": "'Excuse me, can you help me?' é educado e natural." },
+      { "question": "'Turn right' significa:", "options": ["vire à esquerda", "vire à direita", "siga em frente", "volte"], "answer": 1, "explanation": "'Right' = direita; 'left' = esquerda." },
+      { "question": "Complete: 'I'd like to ___ a room for two nights.'", "options": ["book", "buy", "take", "rent car"], "answer": 0, "explanation": "'Book a room' = reservar um quarto." }
+    ],
+    "call": {
+      "title": "Check-in no hotel",
+      "lines": [
+        { "bibi": "Good evening! Welcome to the Sunny Hotel. How can I help you?", "bibiPt": "Boa noite! Bem-vindo ao Hotel Sunny. Como posso ajudar?", "model": "Hi! I'd like to book a room, please.", "hintPt": "Peça um quarto: 'I'd like to book a room'.", "accept": ["book", "room", "reservation", "i'd like", "i would like"] },
+        { "bibi": "Of course. For how many nights?", "bibiPt": "Claro. Por quantas noites?", "model": "For two nights, please.", "hintPt": "Diga quantas noites: 'For ... nights'.", "accept": ["night", "nights", "one", "two", "three", "four", "five", "week"] },
+        { "bibi": "Perfect. Can I see your passport, please?", "bibiPt": "Perfeito. Posso ver seu passaporte, por favor?", "model": "Sure, here you are.", "hintPt": "Entregue o passaporte: 'Sure, here you are'.", "accept": ["sure", "here", "yes", "of course", "passport"] }
+      ],
+      "end": "Thank you! Your room is 305. Enjoy your stay!",
+      "endPt": "Obrigada! Seu quarto é o 305. Aproveite a estadia!"
+    }
   },
   {
     "id": "past-tense",
-    "title": "Tempos Verbais: Passado",
-    "icon": "⏳",
     "level": "A2",
-    "tip": "Verbos regulares no passado terminam em '-ed' (walk → walked). Verbos irregulares mudam de forma (go → went) e precisam ser memorizados.",
-    "vocabulary": [
-      { "word": "went (go)", "meaning": "foi/fui", "example": "I went to the cinema yesterday." },
-      { "word": "saw (see)", "meaning": "vi/viu", "example": "She saw a great movie last night." },
-      { "word": "had (have)", "meaning": "tive/teve", "example": "We had a wonderful trip." },
-      { "word": "worked (work)", "meaning": "trabalhei/trabalhou", "example": "He worked late yesterday." },
-      { "word": "did (do)", "meaning": "fiz/fez", "example": "Did you do your homework?" },
-      { "word": "didn't (did not)", "meaning": "não fiz/fez", "example": "I didn't watch TV last night." }
+    "title": "Passado",
+    "icon": "⏳",
+    "tip": "Verbos regulares no passado ganham '-ed' (work → worked). Os irregulares mudam de forma (go → went, eat → ate). Na negativa, use 'didn't' + verbo normal: 'I didn't go'.",
+    "words": [
+      { "en": "went", "pt": "fui / foi (passado de go)", "ex": "I went to the beach yesterday.", "exPt": "Eu fui à praia ontem." },
+      { "en": "saw", "pt": "vi / viu (passado de see)", "ex": "She saw a great movie last night.", "exPt": "Ela viu um ótimo filme ontem à noite." },
+      { "en": "ate", "pt": "comi / comeu (passado de eat)", "ex": "We ate pizza on Friday.", "exPt": "Nós comemos pizza na sexta." },
+      { "en": "bought", "pt": "comprei / comprou (passado de buy)", "ex": "He bought a new phone.", "exPt": "Ele comprou um celular novo." },
+      { "en": "worked", "pt": "trabalhei / trabalhou", "ex": "I worked late yesterday.", "exPt": "Eu trabalhei até tarde ontem." },
+      { "en": "yesterday", "pt": "ontem", "ex": "I called you yesterday.", "exPt": "Eu te liguei ontem." },
+      { "en": "last week", "pt": "semana passada", "ex": "They traveled last week.", "exPt": "Eles viajaram semana passada." },
+      { "en": "I didn't go", "pt": "Eu não fui", "ex": "I didn't go to school today.", "exPt": "Eu não fui à escola hoje." }
     ],
     "quiz": [
-      { "question": "Qual é o passado de 'go'?", "options": ["goed", "went", "gone", "going"], "answer": 1, "explanation": "'Go' é irregular; o passado simples é 'went'." },
+      { "question": "Qual é o passado de 'go'?", "options": ["goed", "went", "gone", "going"], "answer": 1, "explanation": "'Go' é irregular: o passado é 'went'." },
       { "question": "Complete: 'She ___ a movie last night.' (see)", "options": ["see", "sees", "saw", "seen"], "answer": 2, "explanation": "O passado de 'see' é 'saw'." },
-      { "question": "Como formar a negativa no passado?", "options": ["don't + verbo", "didn't + verbo no passado", "didn't + verbo no infinitivo", "not + verbo"], "answer": 2, "explanation": "Usamos 'didn't' + verbo no infinitivo (sem 'to'): 'I didn't watch'." },
-      { "question": "Qual verbo é regular?", "options": ["go", "see", "work", "have"], "answer": 2, "explanation": "'Work' é regular: work → worked." },
-      { "question": "Complete: 'Did you ___ your homework?'", "options": ["did", "do", "done", "doing"], "answer": 1, "explanation": "Depois de 'did' usamos o verbo no infinitivo sem 'to': 'do'." }
-    ]
+      { "question": "Qual frase negativa está correta?", "options": ["I didn't went.", "I didn't go.", "I don't went.", "I not go."], "answer": 1, "explanation": "Depois de 'didn't' o verbo volta à forma normal: 'I didn't go'." },
+      { "question": "Complete: 'Did you ___ breakfast?'", "options": ["ate", "eat", "eaten", "eating"], "answer": 1, "explanation": "Depois de 'did' usamos o verbo normal: 'Did you eat...?'." }
+    ],
+    "call": {
+      "title": "O que você fez ontem?",
+      "lines": [
+        { "bibi": "Hi! What did you do yesterday?", "bibiPt": "Oi! O que você fez ontem?", "model": "I went to the beach.", "hintPt": "Conte algo no passado: 'I went...', 'I worked...', 'I watched...'", "accept": ["went", "saw", "ate", "bought", "worked", "watched", "played", "stayed", "visited", "studied", "did", "was"] },
+        { "bibi": "Sounds fun! What did you eat?", "bibiPt": "Parece divertido! O que você comeu?", "model": "I ate pizza.", "hintPt": "Diga: 'I ate ...'", "accept": ["ate", "had", "i ate", "i had"] },
+        { "bibi": "Yummy! Did you go to work last week?", "bibiPt": "Delícia! Você foi trabalhar semana passada?", "model": "Yes, I went to work.", "hintPt": "Responda: 'Yes, I did' / 'No, I didn't'.", "accept": ["yes", "no", "didn't", "did", "went"] }
+      ],
+      "end": "Great! Your past tense is getting better!",
+      "endPt": "Ótimo! Seu passado em inglês está melhorando!"
+    }
   },
   {
-    "id": "idioms",
-    "title": "Expressões Idiomáticas",
-    "icon": "💬",
-    "level": "B1",
-    "tip": "Expressões idiomáticas não devem ser traduzidas ao pé da letra. O sentido delas é figurado, então é melhor aprender o significado real de cada uma.",
-    "vocabulary": [
-      { "word": "It's raining cats and dogs", "meaning": "Está chovendo muito forte", "example": "We can't go out, it's raining cats and dogs." },
-      { "word": "Break the ice", "meaning": "Quebrar o gelo", "example": "He told a joke to break the ice." },
-      { "word": "Piece of cake", "meaning": "Muito fácil", "example": "The test was a piece of cake." },
-      { "word": "Under the weather", "meaning": "Se sentindo mal/doente", "example": "I feel a bit under the weather today." },
-      { "word": "Once in a blue moon", "meaning": "Raramente", "example": "I eat fast food once in a blue moon." },
-      { "word": "Hit the books", "meaning": "Estudar bastante", "example": "I have to hit the books for my exam." }
+    "id": "phrasal-verbs",
+    "level": "A2",
+    "title": "Phrasal Verbs",
+    "icon": "🔗",
+    "tip": "Phrasal verbs são verbo + uma palavrinha que muda o sentido: 'look' (olhar) + 'for' = 'look for' (procurar). Aprenda cada um como uma palavra nova.",
+    "words": [
+      { "en": "get up", "pt": "levantar-se (da cama)", "ex": "I get up at six.", "exPt": "Eu me levanto às seis." },
+      { "en": "look for", "pt": "procurar", "ex": "I'm looking for my keys.", "exPt": "Estou procurando minhas chaves." },
+      { "en": "find out", "pt": "descobrir", "ex": "I need to find out the truth.", "exPt": "Eu preciso descobrir a verdade." },
+      { "en": "turn on", "pt": "ligar (um aparelho)", "ex": "Can you turn on the TV?", "exPt": "Você pode ligar a TV?" },
+      { "en": "turn off", "pt": "desligar", "ex": "Please turn off the lights.", "exPt": "Por favor, desligue as luzes." },
+      { "en": "give up", "pt": "desistir", "ex": "Don't give up!", "exPt": "Não desista!" },
+      { "en": "come back", "pt": "voltar", "ex": "She will come back tomorrow.", "exPt": "Ela vai voltar amanhã." },
+      { "en": "pick up", "pt": "buscar (alguém)", "ex": "I'll pick you up at eight.", "exPt": "Eu vou te buscar às oito." }
     ],
     "quiz": [
-      { "question": "O que significa 'Piece of cake'?", "options": ["Pedaço de bolo literal", "Algo muito fácil", "Algo muito difícil", "Uma sobremesa"], "answer": 1, "explanation": "'Piece of cake' é usado para dizer que algo é muito fácil." },
-      { "question": "'It's raining cats and dogs' quer dizer:", "options": ["Está chovendo animais", "Está chovendo pouco", "Está chovendo muito forte", "Vai chover amanhã"], "answer": 2, "explanation": "É uma expressão para dizer que está chovendo muito." },
-      { "question": "'I feel under the weather' significa:", "options": ["Estou no tempo", "Estou me sentindo mal", "Estou com frio", "Estou feliz"], "answer": 1, "explanation": "Significa estar se sentindo doente ou indisposto." },
-      { "question": "'Break the ice' é usado quando:", "options": ["quebramos algo de vidro", "aliviamos uma situação desconfortável", "fazemos gelo", "terminamos um relacionamento"], "answer": 1, "explanation": "Usamos para descrever a ação de tornar uma situação social menos tensa." },
-      { "question": "'Once in a blue moon' significa:", "options": ["Todos os dias", "Raramente", "À noite", "Uma vez por mês exatamente"], "answer": 1, "explanation": "Expressão usada para algo que acontece muito raramente." }
-    ]
+      { "question": "O que significa 'give up'?", "options": ["continuar", "desistir", "subir", "entregar"], "answer": 1, "explanation": "'Give up' = desistir." },
+      { "question": "Complete: 'I'm ___ my phone. Have you seen it?'", "options": ["looking for", "giving up", "turning off", "coming back"], "answer": 0, "explanation": "'Look for' = procurar." },
+      { "question": "O contrário de 'turn on' é:", "options": ["turn up", "turn off", "turn back", "turn in"], "answer": 1, "explanation": "'Turn on' = ligar; 'turn off' = desligar." },
+      { "question": "'I'll pick you up at eight' significa:", "options": ["Eu vou te levantar às oito", "Eu vou te buscar às oito", "Eu vou te ligar às oito", "Eu vou te esperar às oito"], "answer": 1, "explanation": "'Pick someone up' = buscar alguém." }
+    ],
+    "call": {
+      "title": "Combinando um passeio",
+      "lines": [
+        { "bibi": "Hey! Are you ready? I can pick you up at eight.", "bibiPt": "Ei! Você está pronto? Posso te buscar às oito.", "model": "Great! Pick me up at eight, please.", "hintPt": "Aceite a carona.", "accept": ["great", "yes", "okay", "ok", "pick me up", "eight", "sure", "thanks"] },
+        { "bibi": "Wait, I'm looking for my keys. Have you seen them?", "bibiPt": "Espera, estou procurando minhas chaves. Você viu?", "model": "No, I haven't seen them.", "hintPt": "Responda: 'No, I haven't' / 'Yes, they're on the table'.", "accept": ["no", "yes", "haven't", "table", "seen", "look"] },
+        { "bibi": "Found them! Don't forget to turn off the lights.", "bibiPt": "Achei! Não esqueça de desligar as luzes.", "model": "Okay, I'll turn off the lights.", "hintPt": "Diga que vai desligar as luzes.", "accept": ["turn off", "okay", "ok", "sure", "lights", "i will", "i'll"] }
+      ],
+      "end": "Perfect! See you soon!",
+      "endPt": "Perfeito! Até já!"
+    }
   },
   {
-    "id": "news-vocabulary",
-    "title": "Vocabulário de Notícias",
-    "icon": "📰",
-    "level": "B1",
-    "tip": "Manchetes de notícias costumam usar palavras curtas e diretas. Conhecer esse vocabulário ajuda a entender jornais e noticiários em inglês.",
-    "vocabulary": [
-      { "word": "headline", "meaning": "manchete", "example": "The headline says prices are rising." },
-      { "word": "to announce", "meaning": "anunciar", "example": "The company announced new rules today." },
-      { "word": "to launch", "meaning": "lançar", "example": "They launched a new product this week." },
-      { "word": "government", "meaning": "governo", "example": "The government released a new report." },
-      { "word": "to warn", "meaning": "alertar", "example": "Scientists warn about climate change." },
-      { "word": "to face (a problem)", "meaning": "enfrentar", "example": "The city is facing a water shortage." }
+    "id": "feelings",
+    "level": "A2",
+    "title": "Sentimentos e Saúde",
+    "icon": "😊",
+    "tip": "Para sentimentos usamos o verbo 'to be': 'I'm tired' (estou cansado). Para dar conselho use 'should': 'You should rest' (você deveria descansar).",
+    "words": [
+      { "en": "happy", "pt": "feliz", "ex": "I'm very happy today.", "exPt": "Estou muito feliz hoje." },
+      { "en": "sad", "pt": "triste", "ex": "She is sad because it's raining.", "exPt": "Ela está triste porque está chovendo." },
+      { "en": "tired", "pt": "cansado", "ex": "I'm tired after work.", "exPt": "Estou cansado depois do trabalho." },
+      { "en": "worried", "pt": "preocupado", "ex": "He is worried about the test.", "exPt": "Ele está preocupado com a prova." },
+      { "en": "I have a headache", "pt": "Estou com dor de cabeça", "ex": "I have a headache. Do you have any medicine?", "exPt": "Estou com dor de cabeça. Você tem algum remédio?" },
+      { "en": "I feel sick", "pt": "Estou me sentindo mal", "ex": "I feel sick. I want to go home.", "exPt": "Estou me sentindo mal. Quero ir para casa." },
+      { "en": "You should rest", "pt": "Você deveria descansar", "ex": "You look tired. You should rest.", "exPt": "Você parece cansado. Você deveria descansar." },
+      { "en": "Get well soon", "pt": "Melhoras", "ex": "Get well soon, my friend!", "exPt": "Melhoras, meu amigo!" }
     ],
     "quiz": [
-      { "question": "O que é uma 'headline'?", "options": ["um jornalista", "uma manchete", "uma revista", "um repórter"], "answer": 1, "explanation": "'Headline' é o título principal de uma notícia." },
-      { "question": "'To announce' significa:", "options": ["esconder", "anunciar", "cancelar", "assinar"], "answer": 1, "explanation": "'Announce' é comunicar algo publicamente." },
-      { "question": "Complete: 'The city is ___ a serious problem.'", "options": ["facing", "launching", "warning", "announcing"], "answer": 0, "explanation": "'Face a problem' significa enfrentar um problema." },
-      { "question": "O que significa 'to warn'?", "options": ["comemorar", "alertar", "ignorar", "vender"], "answer": 1, "explanation": "'Warn' significa avisar sobre um risco ou perigo." },
-      { "question": "'To launch a product' significa:", "options": ["comprar um produto", "lançar um produto", "devolver um produto", "consertar um produto"], "answer": 1, "explanation": "'Launch' é usado quando algo novo é apresentado ao público." }
-    ]
+      { "question": "'Worried' significa:", "options": ["animado", "preocupado", "bravo", "entediado"], "answer": 1, "explanation": "'Worried' = preocupado." },
+      { "question": "Como dar um conselho em inglês?", "options": ["You should rest.", "You rest must.", "You resting.", "You are rest."], "answer": 0, "explanation": "'Should' + verbo = deveria: 'You should rest'." },
+      { "question": "O que dizer para alguém doente?", "options": ["Good night!", "Get well soon!", "Nice to meet you!", "See you later!"], "answer": 1, "explanation": "'Get well soon' = melhoras." },
+      { "question": "Complete: 'I ___ a headache.'", "options": ["am", "have", "feel", "do"], "answer": 1, "explanation": "Para dores usamos 'have': 'I have a headache'." }
+    ],
+    "call": {
+      "title": "Cuidando de um amigo",
+      "lines": [
+        { "bibi": "Hi! You don't look very well. How do you feel?", "bibiPt": "Oi! Você não parece muito bem. Como você se sente?", "model": "I feel sick. I have a headache.", "hintPt": "Diga como se sente: 'I feel ...' / 'I have a headache'.", "accept": ["feel", "sick", "headache", "tired", "fine", "good", "sad", "okay"] },
+        { "bibi": "Oh no! Did you sleep well last night?", "bibiPt": "Ah não! Você dormiu bem ontem à noite?", "model": "No, I didn't. I'm very tired.", "hintPt": "Responda: 'Yes, I did' / 'No, I didn't'.", "accept": ["yes", "no", "didn't", "did", "tired", "slept"] },
+        { "bibi": "You should rest today. Do you want some tea?", "bibiPt": "Você deveria descansar hoje. Quer um chá?", "model": "Yes, please. Thank you!", "hintPt": "Aceite ou recuse o chá educadamente.", "accept": ["yes", "no", "please", "thank", "thanks"] }
+      ],
+      "end": "Here you go. Get well soon!",
+      "endPt": "Aqui está. Melhoras!"
+    }
   },
   {
-    "id": "business-english",
-    "title": "Inglês nos Negócios",
+    "id": "work",
+    "level": "B1",
+    "title": "Inglês no Trabalho",
     "icon": "💼",
-    "level": "B1",
-    "tip": "No ambiente de trabalho, o inglês costuma ser mais formal e direto. Frases educadas para pedir e sugerir coisas são essenciais em reuniões e e-mails.",
-    "vocabulary": [
-      { "word": "deadline", "meaning": "prazo final", "example": "The deadline for this project is Friday." },
-      { "word": "to schedule a meeting", "meaning": "agendar uma reunião", "example": "Let's schedule a meeting for Monday." },
-      { "word": "to follow up", "meaning": "dar continuidade/retornar", "example": "I'll follow up on this email tomorrow." },
-      { "word": "feedback", "meaning": "retorno/opinião", "example": "Thank you for your feedback." },
-      { "word": "to reach out", "meaning": "entrar em contato", "example": "Feel free to reach out if you have questions." },
-      { "word": "on track", "meaning": "dentro do planejado", "example": "The project is on track for launch." }
+    "tip": "No trabalho, pedidos educados usam 'Could you...?': 'Could you send me the report?' soa muito melhor que 'Send me the report'.",
+    "words": [
+      { "en": "deadline", "pt": "prazo final", "ex": "The deadline is on Friday.", "exPt": "O prazo final é na sexta." },
+      { "en": "meeting", "pt": "reunião", "ex": "We have a meeting at ten.", "exPt": "Nós temos uma reunião às dez." },
+      { "en": "schedule a meeting", "pt": "agendar uma reunião", "ex": "Let's schedule a meeting for Monday.", "exPt": "Vamos agendar uma reunião para segunda." },
+      { "en": "feedback", "pt": "retorno / opinião", "ex": "Thank you for your feedback.", "exPt": "Obrigado pelo seu retorno." },
+      { "en": "reach out", "pt": "entrar em contato", "ex": "Feel free to reach out if you have questions.", "exPt": "Fique à vontade para entrar em contato se tiver dúvidas." },
+      { "en": "on track", "pt": "dentro do planejado", "ex": "The project is on track.", "exPt": "O projeto está dentro do planejado." },
+      { "en": "I'll get back to you", "pt": "Eu te dou um retorno", "ex": "Let me check and I'll get back to you.", "exPt": "Deixa eu verificar e eu te dou um retorno." },
+      { "en": "Could you send me the report?", "pt": "Você poderia me enviar o relatório?", "ex": "Hi Anna, could you send me the report?", "exPt": "Oi Anna, você poderia me enviar o relatório?" }
     ],
     "quiz": [
       { "question": "O que é um 'deadline'?", "options": ["um chefe", "um prazo final", "uma reunião", "um contrato"], "answer": 1, "explanation": "'Deadline' é a data limite para entregar algo." },
-      { "question": "Como dizer 'entrar em contato'?", "options": ["to follow up", "to reach out", "to schedule", "to feedback"], "answer": 1, "explanation": "'Reach out' significa entrar em contato com alguém." },
-      { "question": "'On track' significa:", "options": ["atrasado", "dentro do planejado", "cancelado", "fora do prazo"], "answer": 1, "explanation": "'On track' indica que algo está progredindo como planejado." },
-      { "question": "O que significa 'feedback'?", "options": ["prazo", "retorno/opinião", "reunião", "contrato"], "answer": 1, "explanation": "'Feedback' é uma opinião ou avaliação sobre algo feito." },
-      { "question": "Como dizer 'agendar uma reunião'?", "options": ["to follow up a meeting", "to schedule a meeting", "to reach a meeting", "to track a meeting"], "answer": 1, "explanation": "'Schedule a meeting' significa marcar uma reunião." }
-    ]
+      { "question": "Qual pedido é mais educado?", "options": ["Send me the report.", "Could you send me the report?", "You send report.", "Report, now."], "answer": 1, "explanation": "'Could you...?' é a forma educada de pedir." },
+      { "question": "'The project is on track' significa:", "options": ["O projeto está atrasado", "O projeto está dentro do planejado", "O projeto foi cancelado", "O projeto está nos trilhos do trem"], "answer": 1, "explanation": "'On track' = seguindo como planejado." },
+      { "question": "Como dizer 'eu te dou um retorno'?", "options": ["I'll get back to you.", "I'll come back you.", "I give you back.", "I return you."], "answer": 0, "explanation": "'I'll get back to you' = eu te respondo depois." }
+    ],
+    "call": {
+      "title": "Reunião com a chefe",
+      "lines": [
+        { "bibi": "Good morning! How is the project going?", "bibiPt": "Bom dia! Como está indo o projeto?", "model": "It's going well. We're on track.", "hintPt": "Diga que está indo bem: 'It's going well' / 'We're on track'.", "accept": ["well", "good", "on track", "fine", "going", "great"] },
+        { "bibi": "Great! Could you send me the report by Friday?", "bibiPt": "Ótimo! Você poderia me enviar o relatório até sexta?", "model": "Sure, I'll send it by Friday.", "hintPt": "Confirme: 'Sure, I'll send it by Friday'.", "accept": ["sure", "yes", "of course", "send", "friday", "i will", "i'll"] },
+        { "bibi": "Thanks. Let's schedule a meeting for Monday. Is ten o'clock okay?", "bibiPt": "Obrigada. Vamos agendar uma reunião para segunda. Dez horas está bom?", "model": "Yes, ten o'clock is perfect.", "hintPt": "Aceite ou sugira outro horário.", "accept": ["yes", "okay", "ok", "perfect", "fine", "ten", "sure", "no"] }
+      ],
+      "end": "Perfect. Have a productive day!",
+      "endPt": "Perfeito. Tenha um dia produtivo!"
+    }
+  },
+  {
+    "id": "future-plans",
+    "level": "B1",
+    "title": "Planos e Futuro",
+    "icon": "🗓️",
+    "tip": "'Going to' é para planos já decididos: 'I'm going to travel'. 'Will' é para decisões na hora e promessas: 'I will call you'.",
+    "words": [
+      { "en": "What are your plans?", "pt": "Quais são seus planos?", "ex": "What are your plans for the weekend?", "exPt": "Quais são seus planos para o fim de semana?" },
+      { "en": "I'm going to travel", "pt": "Eu vou viajar", "ex": "I'm going to travel to Chile in July.", "exPt": "Eu vou viajar para o Chile em julho." },
+      { "en": "next year", "pt": "ano que vem", "ex": "She is going to study abroad next year.", "exPt": "Ela vai estudar no exterior ano que vem." },
+      { "en": "weekend", "pt": "fim de semana", "ex": "I'm going to rest this weekend.", "exPt": "Eu vou descansar neste fim de semana." },
+      { "en": "I will call you", "pt": "Eu vou te ligar", "ex": "Don't worry, I will call you tonight.", "exPt": "Não se preocupe, eu vou te ligar hoje à noite." },
+      { "en": "maybe", "pt": "talvez", "ex": "Maybe we can go to the beach.", "exPt": "Talvez a gente possa ir à praia." },
+      { "en": "I hope so", "pt": "Espero que sim", "ex": "Will it be sunny tomorrow? I hope so!", "exPt": "Vai fazer sol amanhã? Espero que sim!" },
+      { "en": "I'm planning to study", "pt": "Estou planejando estudar", "ex": "I'm planning to study English every day.", "exPt": "Estou planejando estudar inglês todo dia." }
+    ],
+    "quiz": [
+      { "question": "Você já comprou a passagem. Qual frase usar?", "options": ["I will travel maybe.", "I'm going to travel to Chile.", "I travel yesterday.", "I traveling Chile."], "answer": 1, "explanation": "Plano decidido = 'going to'." },
+      { "question": "O telefone toca e você decide atender. Você diz:", "options": ["I'm going to answer it!", "I'll answer it!", "I answered it!", "I answer it yesterday!"], "answer": 1, "explanation": "Decisão na hora = 'will' ('I'll')." },
+      { "question": "'I hope so' significa:", "options": ["Eu acho que não", "Espero que sim", "Eu sei disso", "Talvez não"], "answer": 1, "explanation": "'I hope so' = espero que sim." },
+      { "question": "Complete: 'She ___ going to study abroad.'", "options": ["are", "is", "am", "will"], "answer": 1, "explanation": "Com 'she' usamos 'is': 'She is going to...'." }
+    ],
+    "call": {
+      "title": "Planos para as férias",
+      "lines": [
+        { "bibi": "Hi! What are your plans for the weekend?", "bibiPt": "Oi! Quais são seus planos para o fim de semana?", "model": "I'm going to rest and watch movies.", "hintPt": "Conte seus planos: 'I'm going to ...'", "accept": ["going to", "i'm going", "i will", "i'll", "plan", "maybe", "rest", "travel", "study"] },
+        { "bibi": "Nice! And what are you going to do next year?", "bibiPt": "Legal! E o que você vai fazer ano que vem?", "model": "I'm planning to study English and travel.", "hintPt": "Diga seus planos para o ano que vem.", "accept": ["going to", "planning", "plan", "study", "travel", "work", "i will", "i'll", "maybe"] },
+        { "bibi": "That sounds amazing! Will you speak English on your trip?", "bibiPt": "Que incrível! Você vai falar inglês na sua viagem?", "model": "Yes, I hope so!", "hintPt": "Responda: 'Yes, I hope so!' / 'Maybe!'", "accept": ["yes", "hope so", "maybe", "of course", "i will", "sure"] }
+      ],
+      "end": "I'm sure you will! Keep practicing!",
+      "endPt": "Tenho certeza que vai! Continue praticando!"
+    }
+  },
+  {
+    "id": "idioms",
+    "level": "B1",
+    "title": "Expressões Idiomáticas",
+    "icon": "💬",
+    "tip": "Expressões idiomáticas não se traduzem palavra por palavra. 'Piece of cake' não é 'pedaço de bolo' — é 'muito fácil'. Aprenda o sentido de cada uma.",
+    "words": [
+      { "en": "piece of cake", "pt": "muito fácil", "ex": "The test was a piece of cake.", "exPt": "A prova foi muito fácil." },
+      { "en": "break the ice", "pt": "quebrar o gelo", "ex": "He told a joke to break the ice.", "exPt": "Ele contou uma piada para quebrar o gelo." },
+      { "en": "under the weather", "pt": "meio doente", "ex": "I'm feeling a bit under the weather.", "exPt": "Estou me sentindo meio doente." },
+      { "en": "once in a blue moon", "pt": "muito raramente", "ex": "I eat fast food once in a blue moon.", "exPt": "Eu como fast food muito raramente." },
+      { "en": "hit the books", "pt": "estudar muito", "ex": "I have to hit the books tonight.", "exPt": "Eu preciso estudar muito hoje à noite." },
+      { "en": "it's raining cats and dogs", "pt": "está chovendo muito", "ex": "Take an umbrella, it's raining cats and dogs!", "exPt": "Leve um guarda-chuva, está chovendo muito!" },
+      { "en": "cost an arm and a leg", "pt": "custar os olhos da cara", "ex": "This car costs an arm and a leg.", "exPt": "Este carro custa os olhos da cara." },
+      { "en": "call it a day", "pt": "encerrar por hoje", "ex": "We are tired. Let's call it a day.", "exPt": "Estamos cansados. Vamos encerrar por hoje." }
+    ],
+    "quiz": [
+      { "question": "O que significa 'piece of cake'?", "options": ["pedaço de bolo", "muito fácil", "muito difícil", "sobremesa"], "answer": 1, "explanation": "'Piece of cake' = algo muito fácil." },
+      { "question": "Algo que custa muito caro 'costs...':", "options": ["a piece of cake", "an arm and a leg", "cats and dogs", "a blue moon"], "answer": 1, "explanation": "'Cost an arm and a leg' = custar os olhos da cara." },
+      { "question": "'Let's call it a day' significa:", "options": ["Vamos ligar amanhã", "Vamos encerrar por hoje", "Vamos começar o dia", "Vamos chamar alguém"], "answer": 1, "explanation": "'Call it a day' = parar de trabalhar por hoje." },
+      { "question": "'I'm under the weather' significa:", "options": ["Estou meio doente", "Estou na chuva", "Estou com calor", "Estou feliz"], "answer": 0, "explanation": "'Under the weather' = indisposto, meio doente." }
+    ],
+    "call": {
+      "title": "Papo descontraído",
+      "lines": [
+        { "bibi": "Hey! How was your English test? Was it a piece of cake?", "bibiPt": "Ei! Como foi sua prova de inglês? Foi muito fácil?", "model": "Yes, it was a piece of cake!", "hintPt": "Diga se foi fácil ('a piece of cake') ou difícil ('difficult').", "accept": ["piece of cake", "easy", "yes", "no", "difficult", "hard", "it was"] },
+        { "bibi": "Nice! Look outside, it's raining cats and dogs! Do you have an umbrella?", "bibiPt": "Legal! Olha lá fora, está chovendo muito! Você tem guarda-chuva?", "model": "No, I don't. Can I borrow yours?", "hintPt": "Responda: 'Yes, I do' / 'No, I don't'.", "accept": ["yes", "no", "don't", "do", "umbrella", "borrow"] },
+        { "bibi": "Sure! We studied a lot today. Should we call it a day?", "bibiPt": "Claro! Estudamos muito hoje. Vamos encerrar por hoje?", "model": "Yes, let's call it a day!", "hintPt": "Concorde: 'Yes, let's call it a day!'", "accept": ["call it a day", "yes", "let's", "okay", "ok", "sure", "no"] }
+      ],
+      "end": "Awesome! See you next time!",
+      "endPt": "Demais! Até a próxima!"
+    }
+  },
+  {
+    "id": "news",
+    "level": "B1",
+    "title": "Notícias",
+    "icon": "📰",
+    "tip": "Manchetes costumam usar o presente simples mesmo para fatos passados, e cortam palavras como 'the' e 'is': 'Company launches new phone'.",
+    "words": [
+      { "en": "headline", "pt": "manchete", "ex": "The headline says prices are rising.", "exPt": "A manchete diz que os preços estão subindo." },
+      { "en": "breaking news", "pt": "notícia de última hora", "ex": "Breaking news: the storm is coming.", "exPt": "Notícia de última hora: a tempestade está chegando." },
+      { "en": "announce", "pt": "anunciar", "ex": "The company announced new rules today.", "exPt": "A empresa anunciou novas regras hoje." },
+      { "en": "launch", "pt": "lançar", "ex": "They launched a new product this week.", "exPt": "Eles lançaram um novo produto esta semana." },
+      { "en": "government", "pt": "governo", "ex": "The government released a report.", "exPt": "O governo divulgou um relatório." },
+      { "en": "warn", "pt": "alertar", "ex": "Scientists warn about climate change.", "exPt": "Cientistas alertam sobre as mudanças climáticas." },
+      { "en": "according to", "pt": "de acordo com", "ex": "According to the news, it will rain.", "exPt": "De acordo com o noticiário, vai chover." },
+      { "en": "face a problem", "pt": "enfrentar um problema", "ex": "The city is facing a water problem.", "exPt": "A cidade está enfrentando um problema de água." }
+    ],
+    "quiz": [
+      { "question": "O que é uma 'headline'?", "options": ["um jornalista", "uma manchete", "uma revista", "um repórter"], "answer": 1, "explanation": "'Headline' é o título principal de uma notícia." },
+      { "question": "'Breaking news' significa:", "options": ["notícia quebrada", "notícia de última hora", "notícia falsa", "notícia antiga"], "answer": 1, "explanation": "'Breaking news' = notícia de última hora." },
+      { "question": "Complete: '___ the news, prices will go up.'", "options": ["According to", "Agree to", "Accord with", "Because"], "answer": 0, "explanation": "'According to' = de acordo com." },
+      { "question": "'To warn' significa:", "options": ["comemorar", "alertar", "esquentar", "vender"], "answer": 1, "explanation": "'Warn' = avisar sobre um perigo." }
+    ],
+    "call": {
+      "title": "Comentando as notícias",
+      "lines": [
+        { "bibi": "Did you see the news today?", "bibiPt": "Você viu as notícias hoje?", "model": "Yes, I saw the headlines.", "hintPt": "Responda: 'Yes, I did' / 'No, I didn't'.", "accept": ["yes", "no", "did", "didn't", "saw", "news", "headline"] },
+        { "bibi": "According to the news, a storm is coming. Are you worried?", "bibiPt": "De acordo com o noticiário, vem uma tempestade. Você está preocupado?", "model": "A little. I'm going to stay home.", "hintPt": "Diga se está preocupado e o que vai fazer.", "accept": ["yes", "no", "little", "worried", "stay home", "not", "i'm"] },
+        { "bibi": "Good idea. Scientists warn us to be careful. What do you usually read?", "bibiPt": "Boa ideia. Os cientistas alertam para termos cuidado. O que você costuma ler?", "model": "I usually read news on my phone.", "hintPt": "Diga o que você lê: 'I usually read ...'", "accept": ["read", "news", "phone", "books", "websites", "i usually", "internet"] }
+      ],
+      "end": "Great talk! Stay safe!",
+      "endPt": "Ótima conversa! Se cuide!"
+    }
+  },
+  {
+    "id": "opinions",
+    "level": "B2",
+    "title": "Dando Opiniões",
+    "icon": "🗣️",
+    "tip": "Para opinar: 'In my opinion...', 'I think...'. Para contrastar ideias: 'However' (no entanto) e 'On the other hand' (por outro lado).",
+    "words": [
+      { "en": "In my opinion", "pt": "Na minha opinião", "ex": "In my opinion, English is very useful.", "exPt": "Na minha opinião, inglês é muito útil." },
+      { "en": "I agree", "pt": "Eu concordo", "ex": "I agree with you completely.", "exPt": "Eu concordo com você completamente." },
+      { "en": "I disagree", "pt": "Eu discordo", "ex": "Sorry, but I disagree.", "exPt": "Desculpe, mas eu discordo." },
+      { "en": "That's a good point", "pt": "Esse é um bom argumento", "ex": "That's a good point. I didn't think of that.", "exPt": "Esse é um bom argumento. Eu não tinha pensado nisso." },
+      { "en": "On the other hand", "pt": "Por outro lado", "ex": "The city is big. On the other hand, it's expensive.", "exPt": "A cidade é grande. Por outro lado, é cara." },
+      { "en": "However", "pt": "No entanto", "ex": "It was raining. However, we went out.", "exPt": "Estava chovendo. No entanto, nós saímos." },
+      { "en": "It depends", "pt": "Depende", "ex": "Is it expensive? It depends on the season.", "exPt": "É caro? Depende da temporada." },
+      { "en": "I'm not sure about that", "pt": "Não tenho certeza disso", "ex": "Hmm, I'm not sure about that.", "exPt": "Hmm, não tenho certeza disso." }
+    ],
+    "quiz": [
+      { "question": "Como dizer 'Na minha opinião'?", "options": ["In my opinion", "On my opinion", "At my opinion", "For my opinion"], "answer": 0, "explanation": "A preposição correta é 'in': 'In my opinion'." },
+      { "question": "Complete: 'I agree ___ you.'", "options": ["to", "with", "for", "at"], "answer": 1, "explanation": "'Agree with someone' = concordar com alguém." },
+      { "question": "'However' tem o sentido de:", "options": ["porque", "no entanto", "portanto", "também"], "answer": 1, "explanation": "'However' introduz um contraste: no entanto." },
+      { "question": "Qual resposta mostra educadamente que você não concorda?", "options": ["You're wrong!", "No way!", "I'm not sure about that.", "Stop talking."], "answer": 2, "explanation": "'I'm not sure about that' discorda de forma educada." }
+    ],
+    "call": {
+      "title": "Um debate amigável",
+      "lines": [
+        { "bibi": "Let's debate! Do you think everyone should learn English?", "bibiPt": "Vamos debater! Você acha que todo mundo deveria aprender inglês?", "model": "In my opinion, yes. It's very useful.", "hintPt": "Dê sua opinião: 'In my opinion...' / 'I think...'", "accept": ["in my opinion", "i think", "yes", "no", "useful", "important", "it depends", "i agree"] },
+        { "bibi": "That's a good point. But some people say it's too difficult. What do you think?", "bibiPt": "Bom argumento. Mas algumas pessoas dizem que é difícil demais. O que você acha?", "model": "I disagree. It's difficult, however it's possible.", "hintPt": "Concorde ou discorde: 'I agree' / 'I disagree' + motivo.", "accept": ["i agree", "i disagree", "however", "on the other hand", "i think", "possible", "difficult", "not sure", "it depends"] },
+        { "bibi": "Interesting! Is it better to study alone or in a group?", "bibiPt": "Interessante! É melhor estudar sozinho ou em grupo?", "model": "It depends. On the other hand, a group is more fun.", "hintPt": "Use 'It depends' ou 'On the other hand' na resposta.", "accept": ["it depends", "on the other hand", "alone", "group", "better", "i think", "in my opinion"] }
+      ],
+      "end": "You're a great debater! Well done!",
+      "endPt": "Você é ótimo em debates! Muito bem!"
+    }
   }
 ]
