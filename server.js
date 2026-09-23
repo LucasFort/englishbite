@@ -290,9 +290,13 @@ app.post("/api/placement", async (req, res) => {
     return res.status(400).json({ error: "Nível inválido." });
   }
 
+  // Cada unidade tem 5 fases; o teste de nível marca todas as fases das unidades puladas
   const lessons = require("./public/data/lessons.json");
+  const NODE_KEYS = ["1", "2", "practice", "call", "test"];
   const skipLevels = skipLevelsByTier[level];
-  const skipIds = lessons.filter((l) => skipLevels.includes(l.level)).map((l) => l.id);
+  const skipIds = lessons
+    .filter((l) => skipLevels.includes(l.level))
+    .flatMap((l) => NODE_KEYS.map((k) => `${l.id}:${k}`));
 
   const progress = (await redis.get(progressKey(email))) || emptyProgress();
   applyStreak(progress);
