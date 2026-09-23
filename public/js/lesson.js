@@ -3,7 +3,23 @@
 
   const params = new URLSearchParams(window.location.search);
   const unitId = params.get("unit");
-  const node = params.get("node") || "1";
+  // Modos de prática fora da trilha: desafio do dia, revisão de erros e treino misturado
+  const MODES = {
+    daily: { icon: "🎲", title: "Desafio do dia", label: "Desafio do dia", xp: 20 },
+    review: { icon: "🩹", title: "Revisão de erros", label: "Revisão", xp: 10 },
+    mix: { icon: "🔀", title: "Treino relâmpago", label: "Treino", xp: 10 },
+    smart: { icon: "🧠", title: "Memória de longo prazo", label: "Memória · Pro", xp: 15, pro: true },
+    goal: { icon: "🎯", title: "Treino do objetivo", label: "Objetivo · Pro", xp: 15, pro: true },
+  };
+  // Trilha do objetivo (Pro): unidades que mais importam para cada meta
+  const GOAL_UNITS = {
+    travel: ["travel", "food", "shopping", "numbers-time", "greetings"],
+    work: ["work", "future-plans", "opinions", "news", "phrasal-verbs"],
+    talk: ["introductions", "feelings", "family", "daily-routine", "idioms"],
+    grammar: ["past-tense", "future-plans", "phrasal-verbs", "daily-routine", "opinions"],
+  };
+  const mode = MODES[params.get("mode")] ? params.get("mode") : null;
+  const node = mode ? mode : params.get("node") || "1";
   const body = document.getElementById("lessonBody");
   const progressFill = document.getElementById("progressFill");
   const heartsBox = document.getElementById("heartsBox");
@@ -28,14 +44,27 @@
 
   let unit = null;
   let isReview = false;
+  let userGems = 0;
+  let isPro = false;
   try {
     const [units, progress] = await Promise.all([
       fetch("data/lessons.json").then((r) => r.json()),
       Api.request("/api/progress", { auth: true }).catch(() => null),
     ]);
-    unit = units.find((u) => u.id === unitId);
     const done = (progress && progress.completedUnits) || [];
-    isReview = done.includes(`${unitId}:${node}`) || done.includes(unitId);
+    userGems = (progress && progress.gems) || 0;
+    isPro = !!(progress && progress.pro);
+    if (mode && MODES[mode].pro && !isPro) {
+      window.location.href = "home.html#pro";
+      return;
+    }
+    if (mode) {
+      unit = practiceUnit(units, progress || {});
+      Object.assign(NODE_INFO, { [mode]: { label: MODES[mode].label, xp: MODES[mode].xp } });
+    } else {
+      unit = units.find((u) => u.id === unitId);
+      isReview = done.includes(`${unitId}:${node}`) || done.includes(unitId);
+    }
   } catch (err) {
     body.innerHTML = `<p style="color:var(--red-dark)">Não foi possível carregar a lição.</p>`;
     return;
@@ -43,6 +72,55 @@
   if (!unit || !NODE_INFO[node]) {
     body.innerHTML = `<p style="color:var(--red-dark)">Lição não encontrada.</p>`;
     return;
+  }
+
+  // Monta uma "unidade" com palavras de várias unidades já liberadas pelo aluno
+  function practiceUnit(units, progress) {
+    const done = new Set(progress.completedUnits || []);
+    const started = units.filter((u) => done.has(u.id) || [...done].some((d) => d.startsWith(u.id + ":")));
+    const pool = started.length ? started : units.slice(0, 1);
+    const all = pool.flatMap((u) => u.words.map((w) => Object.assign({ unitId: u.id }, w)));
+    let words;
+    const every = units.flatMap((u) => u.words);
+    if (mode === "smart") {
+      // primeiro as expressões "vencidas" (a ponto de serem esquecidas), das mais fracas para as mais fortes
+      const srs = progress.srs || {};
+      const today = progress.today || new Date().toISOString().slice(0, 10);
+      const known = every.filter((w) => srs[w.en]);
+      const due = known.filter((w) => srs[w.en].d <= today).sort((a, b) => srs[a.en].b - srs[b.en].b);
+      const later = known.filter((w) => srs[w.en].d > today).sort((a, b) => srs[a.en].b - srs[b.en].b || (srs[a.en].d < srs[b.en].d ? -1 : 1));
+      words = due.concat(later).slice(0, 10);
+      if (words.length < 8) words = words.concat(sample(all.filter((w) => !words.some((x) => x.en === w.en)), 8 - words.length));
+    } else if (mode === "goal") {
+      const ids = GOAL_UNITS[progress.goalTheme] || GOAL_UNITS.talk;
+      const goalUnits = units.filter((u) => ids.includes(u.id));
+      words = sample(goalUnits.flatMap((u) => u.words), 12);
+      pool.splice(0, pool.length, ...goalUnits); // os desafios de gramática também vêm do objetivo
+    } else if (mode === "review") {
+      const weak = new Set(progress.weak || []);
+      const allUnits = units.flatMap((u) => u.words);
+      words = allUnits.filter((w) => weak.has(w.en));
+      // completa com palavras aleatórias para ter opções suficientes nos exercícios
+      if (words.length < 8) words = words.concat(sample(all.filter((w) => !weak.has(w.en)), 8 - words.length));
+    } else {
+      words = sample(all, 12);
+    }
+    const quiz = sample(pool.flatMap((u) => u.quiz), mode === "daily" ? 3 : 2);
+    return {
+      id: mode,
+      icon: MODES[mode].icon,
+      title: MODES[mode].title,
+      level: pool[pool.length - 1].level,
+      tip:
+        mode === "review"
+          ? "Aqui estão as expressões que você errou. Acerte para tirá-las da lista!"
+          : mode === "smart"
+          ? "Revisão no momento certo: estas expressões estão prestes a sair da sua memória."
+          : `Palavras misturadas de ${pool.length} unidade(s)${mode === "goal" ? " escolhidas para o seu objetivo" : " que você já estudou"}.`,
+      words,
+      quiz,
+      weakTargets: mode === "review" ? new Set(progress.weak || []) : null,
+    };
   }
   document.title = `${unit.title} — EnglishBite`;
   Sounds.preload(unit.words.map((w) => w.en));
@@ -55,6 +133,25 @@
 
   let state = "intro"; // intro | answering | checked | done
   let ex = null; // exercício atual
+  let combo = 0;
+  let bestCombo = 0;
+  const weakWords = new Set(); // errou nesta fase → vai para a revisão
+  const fixedWords = new Set(); // acertou de primeira na revisão → sai da lista
+  const results = []; // primeira tentativa em cada expressão → memória de longo prazo
+  const skillStats = {}; // acertos por habilidade → Raio-X do inglês
+  const SKILL_OF = { listen: "listen", dictation: "listen", type: "write", translate: "write", speak: "speak", meaning: "vocab", reverse: "vocab", fill: "vocab", quiz: "grammar" };
+  function track(ok) {
+    if (!ex || ex.redo) return;
+    if (ex.word && !results.some((r) => r.en === ex.word.en)) results.push({ en: ex.word.en, ok });
+    const s = SKILL_OF[ex.type];
+    if (!s) return;
+    skillStats[s] = skillStats[s] || [0, 0];
+    skillStats[s][0] += ok ? 1 : 0;
+    skillStats[s][1] += 1;
+  }
+  const comboPill = document.createElement("div");
+  comboPill.className = "combo-pill";
+  document.body.appendChild(comboPill);
   if (node === "call") return runCall();
 
   // ======================================================================
@@ -70,6 +167,15 @@
   let firstTry = 0;
   let skipped = 0;
   let startedAt = Date.now();
+
+  function showCombo() {
+    if (combo < 3) return comboPill.classList.remove("show");
+    comboPill.textContent = `🔥 ${combo} seguidas!`;
+    comboPill.classList.remove("show", "pulse");
+    void comboPill.offsetWidth;
+    comboPill.classList.add("show", "pulse");
+    if (combo % 5 === 0) Sounds.levelUp && Sounds.levelUp();
+  }
 
   mainBtn.addEventListener("click", onMain);
   skipBtn.addEventListener("click", () => {
@@ -105,50 +211,95 @@
   renderIntro();
 
   // ---------- Montagem da fase ----------
+  // Cada fase é sorteada na hora: a ordem das palavras e o tipo de exercício mudam
+  // a cada tentativa, então dois alunos (ou duas revisões) nunca veem a mesma sequência.
   function buildQueue() {
     const W = unit.words;
     const q = [];
     const add = (x) => x && q.push(x);
+    // Exercícios que praticam uma palavra (w) já apresentada
+    const DRILLS = {
+      listen: (w) => ({ type: "listen", item: w, word: w }),
+      listenEx: (w) => ({ type: "listen", item: w, example: true, word: w }),
+      type: (w) => ({ type: "type", en: w.en, pt: w.pt, word: w }),
+      reverse: (w) => ({ type: "reverse", item: w, word: w }),
+      fill: (w) => canFill(w) && { type: "fill", item: w, word: w },
+      translate: (w) => ({ type: "translate", en: w.ex, pt: w.exPt, word: w }),
+      translateWord: (w) => tokens(w.en).length >= 2 && { type: "translate", en: w.en, pt: w.pt, word: w },
+      dictation: (w) => ({ type: "dictation", en: pick([w.en, w.ex]), word: w }),
+      speak: (w) => ({ type: "speak", en: w.en, pt: w.pt, word: w }),
+      speakEx: (w) => ({ type: "speak", en: w.ex, pt: w.exPt, word: w }),
+      meaning: (w) => ({ type: "meaning", item: w, word: w }),
+    };
+    // Sorteia o tipo, mas dá preferência aos menos usados na fase (para variar de verdade)
+    const used = {};
+    const drill = (w, kinds) => {
+      const order = shuffle(kinds.slice()).sort((a, b) => (used[a] || 0) - (used[b] || 0));
+      for (const k of order) {
+        if ((k === "speak" || k === "speakEx") && !canSpeak) continue;
+        const x = DRILLS[k](w);
+        if (x) {
+          used[k] = (used[k] || 0) + 1;
+          return x;
+        }
+      }
+      return DRILLS.meaning(w);
+    };
+
     if (node === "1" || node === "2") {
-      const ws = node === "1" ? W.slice(0, 4) : W.slice(4, 8);
-      const multi = ws.find((w) => tokens(w.en).length >= 2) || ws[3];
-      add({ type: "meaning", item: ws[0], isNew: true });
-      add({ type: "meaning", item: ws[1], isNew: true });
-      add({ type: "listen", item: ws[0] });
-      add({ type: "meaning", item: ws[2], isNew: true });
-      add({ type: "meaning", item: ws[3], isNew: true });
+      const ws = shuffle(node === "1" ? W.slice(0, 4) : W.slice(4, 8));
+      const easy = ["listen", "reverse", "fill", "meaning"];
+      const hard = ["type", "translateWord", "dictation", "speak", "fill", "reverse"];
+      // apresenta 2 palavras, pratica, apresenta mais 2, pratica, depois mistura tudo
+      ws.slice(0, 2).forEach((w) => add({ type: "meaning", item: w, isNew: true, word: w }));
+      add(drill(ws[0], easy));
+      ws.slice(2).forEach((w) => add({ type: "meaning", item: w, isNew: true, word: w }));
+      add(drill(ws[1], easy));
       add({ type: "match", items: ws });
-      add({ type: "type", en: ws[1].en, pt: ws[1].pt });
-      add({ type: "speak", en: ws[2].en, pt: ws[2].pt });
-      add({ type: "listen", item: ws[3] });
-      add({ type: "translate", en: multi.en, pt: multi.pt });
-      add({ type: "dictation", en: ws[2].en });
-      add({ type: "speak", en: ws[0].en, pt: ws[0].pt });
+      shuffle(ws.slice()).forEach((w) => add(drill(w, hard)));
+      add(drill(pick(ws), easy));
     } else if (node === "practice") {
       const ws = shuffle(W.slice());
-      add({ type: "translate", en: ws[0].ex, pt: ws[0].exPt });
-      add({ type: "dictation", en: ws[1].ex });
-      add({ type: "speak", en: ws[2].ex, pt: ws[2].exPt });
-      add({ type: "type", en: ws[3].en, pt: ws[3].pt });
-      add({ type: "listen", item: ws[4], example: true });
-      add({ type: "match", items: shuffle(W.slice()).slice(0, 5) });
-      add({ type: "translate", en: ws[5].ex, pt: ws[5].exPt });
-      add({ type: "speak", en: ws[6].ex, pt: ws[6].exPt });
-      add({ type: "type", en: ws[7].en, pt: ws[7].pt });
-      add({ type: "dictation", en: ws[3].ex });
-      add({ type: "meaning", item: ws[4] });
+      const kinds = ["translate", "dictation", "speakEx", "type", "listenEx", "fill", "reverse"];
+      ws.slice(0, 5).forEach((w) => add(drill(w, kinds)));
+      add({ type: "match", items: sample(W, 5) });
+      ws.slice(5).forEach((w) => add(drill(w, kinds)));
+      add(drill(ws[0], ["translate", "speakEx"]));
     } else if (node === "test") {
       const ws = shuffle(W.slice());
       unit.quiz.forEach((item) => add({ type: "quiz", item }));
-      add({ type: "type", en: ws[0].en, pt: ws[0].pt });
-      add({ type: "listen", item: ws[1], example: true });
-      add({ type: "speak", en: ws[2].ex, pt: ws[2].exPt });
-      add({ type: "translate", en: ws[3].ex, pt: ws[3].exPt });
-      add({ type: "dictation", en: ws[4].en });
-      add({ type: "meaning", item: ws[5] });
+      const kinds = ["type", "listenEx", "speakEx", "translate", "dictation", "fill", "reverse"];
+      ws.slice(0, 6).forEach((w) => add(drill(w, kinds)));
       shuffle(q);
+    } else {
+      // modos de prática: daily (mais longo), review e mix
+      const size = mode === "daily" ? 10 : 8;
+      const targets = unit.weakTargets ? W.filter((w) => unit.weakTargets.has(w.en)) : W;
+      let ws = shuffle((targets.length ? targets : W).slice()).slice(0, size);
+      // poucos erros? completa com outras palavras para a revisão não ficar curta demais
+      if (ws.length < 6) ws = ws.concat(sample(W.filter((w) => !ws.includes(w)), 6 - ws.length));
+      const kinds = ["listen", "listenEx", "type", "reverse", "fill", "translate", "dictation", "speak", "meaning", "translateWord"];
+      ws.forEach((w) => add(drill(w, kinds)));
+      unit.quiz.forEach((item) => add({ type: "quiz", item }));
+      shuffle(q);
+      add({ type: "match", items: sample(W, 5) });
     }
     return q.filter((x) => !(x.type === "speak" && !canSpeak));
+  }
+
+  // A palavra aparece "inteira" no exemplo? Então dá para esconder e pedir para completar
+  function canFill(w) {
+    return fillParts(w) !== null;
+  }
+  function fillParts(w) {
+    const target = w.en.replace(/[?!.,]+$/, "");
+    const i = w.ex.toLowerCase().indexOf(target.toLowerCase());
+    if (i < 0 || normalize(target) === normalize(w.ex)) return null;
+    const before = w.ex.slice(0, i);
+    const after = w.ex.slice(i + target.length);
+    // só aceita quando é a palavra inteira (não um pedaço de outra palavra)
+    if (/[a-z]$/i.test(before) || /^[a-z]/i.test(after)) return null;
+    return { before, answer: w.ex.slice(i, i + target.length), after };
   }
 
   function renderIntro() {
@@ -172,14 +323,23 @@
         <div class="tip-box" style="text-align:left">💡 ${esc(unit.tip)}</div>`;
     } else if (node === "practice") {
       content = `<p class="sub">Hora de usar as expressões em frases completas: escutar, escrever e falar.</p>`;
+    } else if (mode === "daily") {
+      content = `<p class="sub">Um desafio novo todo dia, sorteado só para você, com palavras de tudo o que você já estudou.<br><b>Vença para ganhar +5 🍯 de bônus!</b></p>`;
+    } else if (mode === "review") {
+      const n = unit.weakTargets.size;
+      content = `<p class="sub">${n ? `Você tem <b>${n}</b> expressão(ões) para revisar. Cada acerto tira uma da lista!` : "Você não tem erros para revisar agora. Vamos treinar palavras aleatórias!"}</p>`;
+    } else if (mode === "mix") {
+      content = `<p class="sub">Um treino rápido e diferente a cada vez, misturando as unidades que você já estudou.</p>`;
+    } else if (mode === "smart" || mode === "goal") {
+      content = `<p class="sub">${esc(unit.tip)}<br><b>👑 Pro: vidas infinitas neste e em todos os treinos.</b></p>`;
     } else {
       content = `<p class="sub">Mostre o que você aprendeu na unidade. Cuidado com as vidas! ❤️</p>`;
     }
     body.innerHTML = `
       <div class="result-card">
         <img class="mascot" src="img/bee.svg" alt="" style="width:120px">
-        <div class="ex-label" style="justify-content:center;display:flex">${unit.icon} ${esc(unit.title)} · ${info.label}</div>
-        <h2 style="color:var(--title)">${node === "test" ? "Desafio da unidade 🏆" : node === "practice" ? "Vamos praticar! 💪" : "Novas palavras ✨"}</h2>
+        <div class="ex-label" style="justify-content:center;display:flex">${mode ? `${unit.icon} ${info.label}` : `${unit.icon} ${esc(unit.title)} · ${info.label}`}</div>
+        <h2 style="color:var(--title)">${mode ? `${unit.title} ${unit.icon}` : node === "test" ? "Desafio da unidade 🏆" : node === "practice" ? "Vamos praticar! 💪" : "Novas palavras ✨"}</h2>
         ${content}
         ${Mic.supported() ? "" : `<p class="sub" style="font-size:.9rem">🎤 Seu navegador não reconhece fala. Nos exercícios de pronúncia você grava a sua voz e compara com a da Bibi. Para correção automática, use o Chrome ou o Edge.</p>`}
       </div>`;
@@ -246,8 +406,13 @@
     mainBtn.disabled = false;
     mainBtn.textContent = "Continuar";
     if (ok) {
+      track(true);
       solved++;
       if (!ex.redo) firstTry++;
+      combo++;
+      bestCombo = Math.max(bestCombo, combo);
+      showCombo();
+      if (!ex.redo && ex.word && unit.weakTargets && unit.weakTargets.has(ex.word.en) && !weakWords.has(ex.word.en)) fixedWords.add(ex.word.en);
       Sounds.correct();
       footer.className = "lesson-footer correct";
       fbBadge.textContent = "✓";
@@ -263,8 +428,15 @@
       fbTitle.textContent = "Vamos seguir!";
       fbDetail.textContent = note || "";
     } else {
-      hearts = Math.max(0, hearts - 1);
+      track(false);
+      if (!isPro) hearts = Math.max(0, hearts - 1); // Pro: vidas infinitas
       mistakes++;
+      combo = 0;
+      showCombo();
+      if (ex.word) {
+        weakWords.add(ex.word.en);
+        fixedWords.delete(ex.word.en);
+      }
       Sounds.wrong();
       renderHearts(true);
       footer.className = "lesson-footer wrong";
@@ -281,7 +453,7 @@
   }
 
   function renderHearts(bump) {
-    heartsVal.textContent = hearts;
+    heartsVal.textContent = isPro ? "∞" : hearts;
     if (bump) {
       heartsBox.classList.remove("bump");
       void heartsBox.offsetWidth;
@@ -311,6 +483,49 @@
       Sounds.say(w.en);
       const choose = singleChoice(opts);
       e.check = () => ({ ok: opts[choose()] === w.pt, answer: w.pt });
+    },
+
+    // Português → escolha a expressão em inglês
+    reverse(e) {
+      const w = e.item;
+      const opts = shuffle([w.en, ...sample(unit.words.filter((x) => x.en !== w.en).map((x) => x.en), 3)]);
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, "🔄 Ao contrário")}
+          <h2>Como se diz em inglês?</h2>
+          <div class="prompt">
+            <img src="img/bee.svg" alt="">
+            <div class="speech"><span>${esc(w.pt)}</span></div>
+          </div>
+          <div class="options">${opts.map(optionHtml).join("")}</div>
+        </div>`;
+      const choose = singleChoice(opts, true);
+      e.check = () => ({ ok: opts[choose()] === w.en, answer: w.en, speak: w.en });
+    },
+
+    // Frase de exemplo com uma lacuna para completar
+    fill(e) {
+      const w = e.item;
+      const parts = fillParts(w);
+      const strip = (s) => s.replace(/[?!.,]+$/, "");
+      const opts = shuffle([parts.answer, ...sample(unit.words.filter((x) => x.en !== w.en).map((x) => strip(x.en)), 3)]);
+      body.innerHTML = `
+        <div class="question-card">
+          ${label(e, "🕳️ Complete")}
+          <h2>Complete a frase</h2>
+          <div class="fill-sentence">${esc(parts.before)}<span class="blank" id="blank">&nbsp;</span>${esc(parts.after)}</div>
+          <div class="fill-pt">${esc(w.exPt)}</div>
+          <div class="options">${opts.map(optionHtml).join("")}</div>
+        </div>`;
+      const blank = body.querySelector("#blank");
+      const choose = singleChoice(opts);
+      body.querySelectorAll(".options .option").forEach((b, i) =>
+        b.addEventListener("click", () => {
+          blank.textContent = opts[i];
+          blank.classList.add("filled");
+        })
+      );
+      e.check = () => ({ ok: normalize(opts[choose()]) === normalize(parts.answer), answer: w.ex, speak: w.ex });
     },
 
     listen(e) {
@@ -572,14 +787,37 @@
     mainBtn.disabled = false;
     ex = {};
 
+    comboPill.classList.remove("show");
     if (!passed) {
       Sounds.tryAgain();
+      const REFILL = 15;
       body.innerHTML = `
         <div class="result-card">
           <img class="mascot" src="img/bee.svg" alt="" style="filter:grayscale(.6)">
           <h2 class="fail">Você ficou sem vidas 💔</h2>
           <p class="sub">Tudo bem errar — é assim que se aprende. Que tal tentar de novo?</p>
+          <div class="refill-box">
+            <b>Continuar de onde parou?</b>
+            <p>Recarregue as 5 vidas com mel e não perca o que já fez.</p>
+            <button class="btn btn-blue" id="refillBtn" ${userGems < REFILL ? "disabled" : ""}>Recarregar por ${REFILL} 🍯</button>
+            <div class="refill-have">Você tem ${userGems} 🍯</div>
+          </div>
         </div>`;
+      body.querySelector("#refillBtn").addEventListener("click", async (ev) => {
+        ev.target.disabled = true;
+        try {
+          const p = await Api.request("/api/shop", { method: "POST", auth: true, body: { item: "hearts" } });
+          userGems = p.gems;
+          hearts = MAX_HEARTS;
+          renderHearts(true);
+          Sounds.levelUp();
+          skipBtn.onclick = null;
+          next();
+        } catch (err) {
+          ev.target.disabled = false;
+          body.querySelector(".refill-have").textContent = err.message;
+        }
+      });
       mainBtn.textContent = "Tentar de novo";
       skipBtn.textContent = "Sair";
       skipBtn.style.visibility = "visible";
@@ -599,10 +837,11 @@
       xpEarned,
       stat2: { label: "Precisão", value: `🎯 ${Math.min(100, accuracy)}%` },
       secs,
+      perfect: mistakes === 0,
     });
   }
 
-  function showDone({ title, sub, xpEarned, stat2, secs }) {
+  function showDone({ title, sub, xpEarned, stat2, secs, perfect, kind }) {
     state = "done";
     const time = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
     body.innerHTML = `
@@ -615,7 +854,10 @@
           <div class="result-stat" style="--tone:var(--green)"><div class="label">${stat2.label}</div><div class="value">${stat2.value}</div></div>
           <div class="result-stat" style="--tone:var(--blue)"><div class="label">Tempo</div><div class="value">⏱️ ${time}</div></div>
         </div>
+        ${bestCombo >= 3 ? `<p class="sub" style="margin:18px 0 0">🔥 Melhor sequência: <b>${bestCombo} acertos seguidos</b></p>` : ""}
+        <div class="rewards" id="rewards"></div>
       </div>`;
+    if (perfect) confetti();
     footer.className = "lesson-footer";
     footer.style.display = "";
     skipBtn.style.visibility = "hidden";
@@ -626,12 +868,67 @@
     Api.request("/api/progress", {
       method: "POST",
       auth: true,
-      body: { unitId: `${unit.id}:${node}`, xpEarned, passed: true },
+      body: {
+        unitId: mode ? `mode:${mode}` : `${unit.id}:${node}`,
+        xpEarned,
+        passed: true,
+        perfect: !!perfect,
+        combo: bestCombo,
+        kind: kind || mode || "lesson",
+        weak: [...weakWords],
+        fixed: [...fixedWords],
+        results,
+        skills: skillStats,
+      },
     })
+      .then((p) => showRewards(p.events || {}))
       .catch((err) => {
         if (err.message === "UNAUTHORIZED") Api.logout();
       })
       .finally(() => (mainBtn.disabled = false));
+  }
+
+  // Mostra o que a fase rendeu: meta diária, ofensiva, mel, conquistas e missões
+  function showRewards(ev) {
+    const box = document.getElementById("rewards");
+    if (!box) return;
+    // o servidor tem a palavra final sobre o XP (ex.: desafio do dia repetido vale menos)
+    const xpBox = document.querySelector(".result-stat .value");
+    if (xpBox && typeof ev.xpEarned === "number") xpBox.textContent = `⚡ ${ev.xpEarned}`;
+    const items = [];
+    if (ev.streakExtended) items.push(["🔥", "Ofensiva mantida!", "Volte amanhã para continuar a sequência."]);
+    if (ev.goalReached) items.push(["🎯", "Meta diária batida!", "+5 🍯 de bônus"]);
+    if (ev.challengeWon) items.push(["🎲", "Desafio do dia vencido!", "+5 🍯 de bônus. Amanhã tem outro!"]);
+    if (ev.gemsEarned) items.push(["🍯", `+${ev.gemsEarned} de mel`, "Use na loja para proteger sua ofensiva."]);
+    (ev.newAchievements || []).forEach((a) => items.push([a.icon, `Conquista: ${a.title}`, a.desc]));
+    (ev.questsReady || []).forEach((q) => items.push(["📜", "Missão concluída!", `${q} — resgate na tela inicial.`]));
+    if (weakWords.size && mode !== "review") items.push(["🩹", `${weakWords.size} expressão(ões) para revisar`, "Elas ficam na sua Revisão de erros."]);
+    if (fixedWords.size) items.push(["✅", `${fixedWords.size} erro(s) corrigido(s)`, "Saíram da sua lista de revisão."]);
+    box.innerHTML = items
+      .map(([icon, title, desc], i) => `<div class="reward" style="animation-delay:${0.15 * i}s"><span class="ico">${icon}</span><div><b>${esc(title)}</b><small>${esc(desc)}</small></div></div>`)
+      .join("");
+    if ((ev.newAchievements || []).length || ev.goalReached || ev.challengeWon) {
+      Sounds.levelUp();
+      confetti();
+    }
+  }
+
+  function confetti() {
+    const colors = ["#58cc02", "#1cb0f6", "#ffc800", "#ff4b4b", "#ce82ff", "#ff9600"];
+    const layer = document.createElement("div");
+    layer.className = "confetti";
+    for (let i = 0; i < 80; i++) {
+      const p = document.createElement("i");
+      p.style.left = Math.random() * 100 + "%";
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = Math.random() * 0.6 + "s";
+      p.style.animationDuration = 1.6 + Math.random() * 1.4 + "s";
+      p.style.setProperty("--drift", (Math.random() * 160 - 80).toFixed(0) + "px");
+      p.style.transform = `rotate(${Math.random() * 360}deg)`;
+      layer.appendChild(p);
+    }
+    document.body.appendChild(layer);
+    setTimeout(() => layer.remove(), 3600);
   }
 
   // ======================================================================
@@ -814,6 +1111,8 @@
         xpEarned,
         stat2: { label: "Respostas", value: `💬 ${firstTryOk}/${call.lines.length}` },
         secs,
+        perfect: firstTryOk === call.lines.length,
+        kind: "call",
       });
     }
   }
