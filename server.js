@@ -97,10 +97,6 @@ function progressKey(email) {
   return `progress:${email}`;
 }
 
-function emptyProgress() {
-  return { xp: 0, streak: 0, lastActiveDate: "", completedUnits: [], level: null };
-}
-
 async function getAuthedEmail(req) {
   const header = req.headers["authorization"];
   if (!header || !header.startsWith("Bearer ")) return null;
@@ -237,43 +233,281 @@ app.get("/api/me", async (req, res) => {
   res.json({ name: user.name, email: user.email });
 });
 
+// ---------- Datas (horário de Brasília) ----------
+function dayStr(offsetDays = 0) {
+  return new Date(Date.now() - 3 * 3600 * 1000 + offsetDays * 86400000).toISOString().slice(0, 10);
+}
+function daysBetween(a, b) {
+  return Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
+}
+function weekInfo() {
+  // semana de segunda a domingo, no horário de Brasília
+  const now = new Date(Date.now() - 3 * 3600 * 1000);
+  const day = (now.getUTCDay() + 6) % 7; // 0 = segunda
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - day));
+  const endsAt = monday.getTime() + 7 * 86400000 + 3 * 3600 * 1000; // domingo 23:59 BRT
+  return { id: monday.toISOString().slice(0, 10), endsAt, elapsed: (day * 86400000 + (now - Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))) / (7 * 86400000) };
+}
+
+// ---------- Gamificação ----------
+const QUESTS = [
+  { id: "xp30", text: "Ganhe 30 XP", goal: 30, field: "xp", reward: 10 },
+  { id: "xp60", text: "Ganhe 60 XP", goal: 60, field: "xp", reward: 20 },
+  { id: "lessons2", text: "Complete 2 fases", goal: 2, field: "lessons", reward: 10 },
+  { id: "lessons4", text: "Complete 4 fases", goal: 4, field: "lessons", reward: 20 },
+  { id: "perfect1", text: "Faça 1 fase sem errar", goal: 1, field: "perfect", reward: 15 },
+  { id: "call1", text: "Faça 1 chamada com a Bibi", goal: 1, field: "calls", reward: 15 },
+  { id: "combo8", text: "Acerte 8 seguidas numa fase", goal: 8, field: "combo", reward: 15 },
+];
+// 3 missões por dia, sempre as mesmas para todo mundo naquele dia
+function questsFor(date) {
+  let h = 0;
+  for (const c of date) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const easy = QUESTS.filter((q) => ["xp30", "lessons2"].includes(q.id));
+  const rest = QUESTS.filter((q) => !easy.includes(q));
+  const first = easy[h % easy.length];
+  const pool = rest.filter((q) => q.field !== first.field);
+  const second = pool[(h >>> 3) % pool.length];
+  const pool2 = pool.filter((q) => q.field !== second.field);
+  const third = pool2[(h >>> 7) % pool2.length];
+  return [first, second, third];
+}
+
+const ACHIEVEMENTS = [
+  { id: "first", icon: "🐣", title: "Primeiro passo", desc: "Complete sua primeira fase", test: (p) => p.totals.lessons >= 1 },
+  { id: "streak3", icon: "🔥", title: "Esquentando", desc: "Ofensiva de 3 dias", test: (p) => p.bestStreak >= 3 },
+  { id: "streak7", icon: "🌋", title: "Imparável", desc: "Ofensiva de 7 dias", test: (p) => p.bestStreak >= 7 },
+  { id: "streak30", icon: "☄️", title: "Lenda", desc: "Ofensiva de 30 dias", test: (p) => p.bestStreak >= 30 },
+  { id: "xp100", icon: "⚡", title: "Energizado", desc: "Junte 100 XP", test: (p) => p.xp >= 100 },
+  { id: "xp500", icon: "💥", title: "Turbinado", desc: "Junte 500 XP", test: (p) => p.xp >= 500 },
+  { id: "xp1500", icon: "🚀", title: "Foguete", desc: "Junte 1.500 XP", test: (p) => p.xp >= 1500 },
+  { id: "call", icon: "📞", title: "Alô, Bibi!", desc: "Faça sua primeira chamada", test: (p) => p.totals.calls >= 1 },
+  { id: "calls10", icon: "🎙️", title: "Tagarela", desc: "Faça 10 chamadas", test: (p) => p.totals.calls >= 10 },
+  { id: "perfect5", icon: "💎", title: "Perfeccionista", desc: "5 fases sem nenhum erro", test: (p) => p.totals.perfect >= 5 },
+  { id: "unit", icon: "🏆", title: "Unidade vencida", desc: "Passe no desafio de uma unidade", test: (p) => p.completedUnits.some((id) => id.endsWith(":test")) },
+  { id: "goal7", icon: "🎯", title: "Focado", desc: "Bata a meta diária 7 vezes", test: (p) => p.totals.goals >= 7 },
+];
+
+const BOTS = [
+  { name: "🤖 Robô Rex", pace: 260 },
+  { name: "🤖 Robô Lola", pace: 190 },
+  { name: "🤖 Robô Zeca", pace: 120 },
+  { name: "🤖 Robô Nina", pace: 70 },
+];
+
+function emptyProgress() {
+  return {
+    xp: 0,
+    streak: 0,
+    bestStreak: 0,
+    lastActiveDate: "",
+    completedUnits: [],
+    level: null,
+    gems: 0,
+    freezes: 0,
+    dailyGoal: 20,
+    daily: { date: "", xp: 0, lessons: 0, perfect: 0, calls: 0, combo: 0, claimed: [], goalHit: false },
+    history: {},
+    totals: { lessons: 0, perfect: 0, calls: 0, goals: 0 },
+    achievements: [],
+  };
+}
+function normalize(p) {
+  const base = emptyProgress();
+  const out = Object.assign(base, p || {});
+  out.daily = Object.assign(emptyProgress().daily, (p || {}).daily);
+  out.totals = Object.assign(emptyProgress().totals, (p || {}).totals);
+  out.history = out.history || {};
+  out.bestStreak = Math.max(Number(out.bestStreak) || 0, Number(out.streak) || 0);
+  const today = dayStr();
+  if (out.daily.date !== today) out.daily = Object.assign(emptyProgress().daily, { date: today });
+  return out;
+}
+// Ofensiva que "já caducou" aparece como 0 (sem mudar o que está salvo)
+function visibleStreak(p) {
+  if (!p.lastActiveDate) return 0;
+  const gap = daysBetween(p.lastActiveDate, dayStr());
+  return gap <= 1 || gap - 1 <= p.freezes ? Number(p.streak) || 0 : 0;
+}
+function applyStreak(p) {
+  const today = dayStr();
+  if (p.lastActiveDate === today) return false;
+  const gap = p.lastActiveDate ? daysBetween(p.lastActiveDate, today) : 99;
+  if (gap === 1) {
+    p.streak = Number(p.streak) + 1;
+  } else if (gap > 1 && gap - 1 <= p.freezes) {
+    p.freezes -= gap - 1; // o protetor de ofensiva salvou os dias perdidos
+    p.streak = Number(p.streak) + 1;
+  } else {
+    p.streak = 1;
+  }
+  p.bestStreak = Math.max(p.bestStreak, p.streak);
+  p.lastActiveDate = today;
+  return true;
+}
+function checkAchievements(p) {
+  const fresh = ACHIEVEMENTS.filter((a) => !p.achievements.includes(a.id) && a.test(p));
+  fresh.forEach((a) => p.achievements.push(a.id));
+  return fresh.map(({ id, icon, title, desc }) => ({ id, icon, title, desc }));
+}
+function publicView(p) {
+  const quests = questsFor(p.daily.date).map((q) => ({
+    id: q.id,
+    text: q.text,
+    goal: q.goal,
+    reward: q.reward,
+    value: Math.min(q.goal, Number(p.daily[q.field]) || 0),
+    claimed: p.daily.claimed.includes(q.id),
+  }));
+  return Object.assign({}, p, {
+    streak: visibleStreak(p),
+    today: dayStr(),
+    quests,
+    achievementList: ACHIEVEMENTS.map(({ id, icon, title, desc }) => ({ id, icon, title, desc, unlocked: p.achievements.includes(id) })),
+  });
+}
+async function loadProgress(email) {
+  return normalize(await redis.get(progressKey(email)));
+}
+async function addLeagueXp(email, xp) {
+  if (!xp) return;
+  const week = weekInfo().id;
+  const user = await redis.get(userKey(email));
+  const parts = String((user && user.name) || "Aluno").trim().split(/\s+/);
+  const display = parts[0] + (parts[1] ? " " + parts[1][0].toUpperCase() + "." : "");
+  await redis.zincrby(`league:${week}`, xp, email);
+  await redis.hset("league:names", { [email]: display });
+  await redis.expire(`league:${week}`, 60 * 60 * 24 * 21);
+}
+
 // ---------- Progresso ----------
 app.get("/api/progress", async (req, res) => {
   const email = await getAuthedEmail(req);
   if (!email) return res.status(401).json({ error: "UNAUTHORIZED" });
-  const progress = await redis.get(progressKey(email));
-  res.json(progress || emptyProgress());
+  res.json(publicView(await loadProgress(email)));
 });
-
-function applyStreak(progress) {
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  if (progress.lastActiveDate === today) {
-    // já contabilizado hoje
-  } else if (progress.lastActiveDate === yesterday) {
-    progress.streak = Number(progress.streak) + 1;
-  } else {
-    progress.streak = 1;
-  }
-  progress.lastActiveDate = today;
-}
 
 app.post("/api/progress", async (req, res) => {
   const email = await getAuthedEmail(req);
   if (!email) return res.status(401).json({ error: "UNAUTHORIZED" });
 
-  const { unitId, xpEarned, passed } = req.body;
-  const progress = (await redis.get(progressKey(email))) || emptyProgress();
+  const { unitId, passed, perfect, kind } = req.body;
+  const xpEarned = Math.max(0, Math.min(40, Number(req.body.xpEarned) || 0));
+  const combo = Math.max(0, Math.min(50, Number(req.body.combo) || 0));
+  const p = await loadProgress(email);
+  const today = dayStr();
 
-  applyStreak(progress);
-  progress.xp = Number(progress.xp) + Number(xpEarned || 0);
+  const streakExtended = applyStreak(p);
+  p.xp = Number(p.xp) + xpEarned;
+  p.daily.xp += xpEarned;
+  p.daily.combo = Math.max(p.daily.combo, combo);
+  p.history[today] = (Number(p.history[today]) || 0) + xpEarned;
+  Object.keys(p.history)
+    .filter((d) => daysBetween(d, today) > 60)
+    .forEach((d) => delete p.history[d]);
 
-  const completed = new Set(progress.completedUnits || []);
-  if (passed) completed.add(unitId);
-  progress.completedUnits = Array.from(completed);
+  let gemsEarned = 0;
+  if (passed) {
+    p.daily.lessons++;
+    p.totals.lessons++;
+    if (perfect) {
+      p.daily.perfect++;
+      p.totals.perfect++;
+    }
+    if (kind === "call") {
+      p.daily.calls++;
+      p.totals.calls++;
+    }
+    gemsEarned = 2 + (perfect ? 3 : 0);
+    const completed = new Set(p.completedUnits || []);
+    completed.add(String(unitId));
+    p.completedUnits = Array.from(completed);
+  }
+  let goalReached = false;
+  if (!p.daily.goalHit && p.daily.xp >= p.dailyGoal) {
+    p.daily.goalHit = true;
+    p.totals.goals++;
+    goalReached = true;
+    gemsEarned += 5;
+  }
+  p.gems += gemsEarned;
+  const newAchievements = checkAchievements(p);
 
-  await redis.set(progressKey(email), progress);
-  res.json(progress);
+  await redis.set(progressKey(email), p);
+  await addLeagueXp(email, xpEarned);
+
+  const view = publicView(p);
+  view.events = {
+    streakExtended,
+    goalReached,
+    gemsEarned,
+    newAchievements,
+    questsReady: view.quests.filter((q) => q.value >= q.goal && !q.claimed).map((q) => q.text),
+  };
+  res.json(view);
+});
+
+app.post("/api/quests/claim", async (req, res) => {
+  const email = await getAuthedEmail(req);
+  if (!email) return res.status(401).json({ error: "UNAUTHORIZED" });
+  const p = await loadProgress(email);
+  const q = questsFor(p.daily.date).find((x) => x.id === req.body.id);
+  if (!q) return res.status(400).json({ error: "Missão não encontrada." });
+  if (p.daily.claimed.includes(q.id)) return res.status(400).json({ error: "Recompensa já resgatada." });
+  if ((Number(p.daily[q.field]) || 0) < q.goal) return res.status(400).json({ error: "Missão ainda não concluída." });
+  p.daily.claimed.push(q.id);
+  p.gems += q.reward;
+  await redis.set(progressKey(email), p);
+  res.json(Object.assign(publicView(p), { reward: q.reward }));
+});
+
+const SHOP = {
+  freeze: { cost: 40, apply: (p) => (p.freezes >= 2 ? "Você já tem o máximo de 2 protetores." : ((p.freezes += 1), null)) },
+  hearts: { cost: 15, apply: () => null },
+};
+app.post("/api/shop", async (req, res) => {
+  const email = await getAuthedEmail(req);
+  if (!email) return res.status(401).json({ error: "UNAUTHORIZED" });
+  const item = SHOP[req.body.item];
+  if (!item) return res.status(400).json({ error: "Item inválido." });
+  const p = await loadProgress(email);
+  if (p.gems < item.cost) return res.status(400).json({ error: "Mel insuficiente." });
+  const err = item.apply(p);
+  if (err) return res.status(400).json({ error: err });
+  p.gems -= item.cost;
+  await redis.set(progressKey(email), p);
+  res.json(publicView(p));
+});
+
+app.post("/api/goal", async (req, res) => {
+  const email = await getAuthedEmail(req);
+  if (!email) return res.status(401).json({ error: "UNAUTHORIZED" });
+  const goal = Number(req.body.goal);
+  if (![10, 20, 30, 50].includes(goal)) return res.status(400).json({ error: "Meta inválida." });
+  const p = await loadProgress(email);
+  p.dailyGoal = goal;
+  await redis.set(progressKey(email), p);
+  res.json(publicView(p));
+});
+
+app.get("/api/league", async (req, res) => {
+  const email = await getAuthedEmail(req);
+  if (!email) return res.status(401).json({ error: "UNAUTHORIZED" });
+  const week = weekInfo();
+  const flat = (await redis.zrange(`league:${week.id}`, 0, 29, { rev: true, withScores: true })) || [];
+  const names = (await redis.hgetall("league:names")) || {};
+  const rows = [];
+  for (let i = 0; i < flat.length; i += 2) {
+    rows.push({ name: names[flat[i]] || "Aluno", xp: Number(flat[i + 1]), me: flat[i] === email });
+  }
+  if (!rows.some((r) => r.me)) {
+    const user = await redis.get(userKey(email));
+    rows.push({ name: ((user && user.name) || "Você").split(" ")[0], xp: 0, me: true });
+  }
+  // Robôs (identificados como robôs) para a liga nunca ficar vazia
+  BOTS.forEach((b) => rows.push({ name: b.name, xp: Math.round(b.pace * week.elapsed), bot: true }));
+  rows.sort((a, b) => b.xp - a.xp);
+  res.json({ week: week.id, endsAt: week.endsAt, rows: rows.slice(0, 30) });
 });
 
 app.post("/api/placement", async (req, res) => {
@@ -298,9 +532,10 @@ app.post("/api/placement", async (req, res) => {
     .filter((l) => skipLevels.includes(l.level))
     .flatMap((l) => NODE_KEYS.map((k) => `${l.id}:${k}`));
 
-  const progress = (await redis.get(progressKey(email))) || emptyProgress();
+  const progress = await loadProgress(email);
   applyStreak(progress);
   progress.xp = Number(progress.xp) + 20;
+  progress.daily.xp += 20;
 
   const completed = new Set(progress.completedUnits || []);
   skipIds.forEach((id) => completed.add(id));
@@ -308,7 +543,8 @@ app.post("/api/placement", async (req, res) => {
   progress.level = level;
 
   await redis.set(progressKey(email), progress);
-  res.json(progress);
+  await addLeagueXp(email, 20);
+  res.json(publicView(progress));
 });
 
 app.listen(PORT, () => {
