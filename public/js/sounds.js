@@ -195,20 +195,85 @@ const Sounds = (() => {
   };
 })();
 
-// Reconhecimento de fala (microfone) — Chrome, Edge e Safari
+// Microfone: permissão, medidor de volume, reconhecimento de fala e gravação
 const Mic = (() => {
   const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null;
+  let meter = null;
+  let recognitionBroken = false; // vira true se o serviço de reconhecimento falhar (ex.: sem internet)
 
-  function supported() {
-    return !!Rec;
+  const canCapture = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  // Reconhece a fala de verdade (Chrome/Edge/Safari)
+  const supported = () => !!Rec && !recognitionBroken;
+  // Pelo menos consegue gravar (usado no modo "compare com a Bibi")
+  const canRecord = () => canCapture() && !!window.MediaRecorder;
+
+  async function permission() {
+    try {
+      return (await navigator.permissions.query({ name: "microphone" })).state; // granted | prompt | denied
+    } catch (e) {
+      return "prompt";
+    }
   }
 
-  // Resolve com a lista de frases entendidas (melhores alternativas primeiro)
-  function listen({ onInterim } = {}) {
+  // Abre o microfone de verdade: é isso que faz o Chrome mostrar o aviso "Permitir microfone"
+  async function openStream() {
+    if (!canCapture()) throw new Error("no-mic");
+    try {
+      return await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    } catch (e) {
+      if (e.name === "NotAllowedError" || e.name === "SecurityError") throw new Error("denied");
+      if (e.name === "NotFoundError" || e.name === "OverconstrainedError") throw new Error("no-mic");
+      if (e.name === "NotReadableError") throw new Error("busy");
+      throw new Error("no-mic");
+    }
+  }
+
+  async function ensurePermission() {
+    const s = await openStream();
+    s.getTracks().forEach((t) => t.stop());
+    return true;
+  }
+
+  function startMeter(stream, onLevel) {
+    stopMeter();
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const src = ctx.createMediaStreamSource(stream);
+      const an = ctx.createAnalyser();
+      an.fftSize = 512;
+      src.connect(an);
+      const data = new Uint8Array(an.fftSize);
+      let raf = 0;
+      const tick = () => {
+        an.getByteTimeDomainData(data);
+        let peak = 0;
+        for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i] - 128));
+        if (onLevel) onLevel(Math.min(1, peak / 70));
+        raf = requestAnimationFrame(tick);
+      };
+      tick();
+      meter = { ctx, stream, stop: () => cancelAnimationFrame(raf) };
+    } catch (e) {
+      meter = { stream, stop() {} };
+    }
+  }
+  function stopMeter() {
+    if (!meter) return;
+    meter.stop();
+    meter.stream.getTracks().forEach((t) => t.stop());
+    if (meter.ctx) meter.ctx.close().catch(() => {});
+    meter = null;
+  }
+
+  // Resolve com as frases entendidas (melhores primeiro). Erros: denied, no-mic, busy, network, unsupported
+  async function listen({ onInterim, onLevel } = {}) {
+    if (!Rec) throw new Error("unsupported");
+    stop();
+    const stream = await openStream(); // garante a permissão antes de começar
+    startMeter(stream, onLevel);
     return new Promise((resolve, reject) => {
-      if (!Rec) return reject(new Error("unsupported"));
-      stop();
       rec = new Rec();
       rec.lang = "en-US";
       rec.interimResults = true;
@@ -216,28 +281,35 @@ const Mic = (() => {
       rec.continuous = false;
       let finals = [];
       let lastInterim = "";
+      let failed = null;
+      const guard = setTimeout(() => stop(), 9000); // não fica ouvindo para sempre
       rec.onresult = (e) => {
         const res = e.results[e.results.length - 1];
-        if (res.isFinal) {
-          finals = Array.from(res).map((a) => a.transcript);
-        } else {
+        if (res.isFinal) finals = Array.from(res).map((a) => a.transcript);
+        else {
           lastInterim = res[0].transcript;
           if (onInterim) onInterim(lastInterim);
         }
       };
       rec.onerror = (e) => {
-        rec = null;
-        if (e.error === "no-speech") resolve([]);
-        else reject(new Error(e.error));
+        if (e.error === "no-speech" || e.error === "aborted") return;
+        if (e.error === "network" || e.error === "service-not-allowed" || e.error === "language-not-supported") recognitionBroken = true;
+        failed = e.error === "not-allowed" ? "denied" : e.error === "audio-capture" ? "no-mic" : recognitionBroken ? "network" : e.error;
       };
       rec.onend = () => {
+        clearTimeout(guard);
         rec = null;
-        resolve(finals.length ? finals : lastInterim ? [lastInterim] : []);
+        stopMeter();
+        if (failed) reject(new Error(failed));
+        else resolve(finals.length ? finals : lastInterim ? [lastInterim] : []);
       };
       try {
         rec.start();
       } catch (err) {
-        reject(err);
+        clearTimeout(guard);
+        stopMeter();
+        rec = null;
+        reject(new Error("unsupported"));
       }
     });
   }
@@ -250,7 +322,40 @@ const Mic = (() => {
     }
   }
 
-  return { supported, listen, stop };
+  // Gravação simples (sem reconhecimento): devolve { stop(): Promise<url> }
+  async function record({ onLevel } = {}) {
+    const stream = await openStream();
+    startMeter(stream, onLevel);
+    const chunks = [];
+    const mr = new MediaRecorder(stream);
+    mr.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    mr.start();
+    const auto = setTimeout(() => mr.state === "recording" && mr.stop(), 8000);
+    const done = new Promise((resolve) => {
+      mr.onstop = () => {
+        clearTimeout(auto);
+        stopMeter();
+        resolve(URL.createObjectURL(new Blob(chunks, { type: mr.mimeType || "audio/webm" })));
+      };
+    });
+    return { stop: () => (mr.state === "recording" && mr.stop(), done), done };
+  }
+
+  // Texto amigável para cada erro
+  function explain(code) {
+    return (
+      {
+        denied:
+          "O microfone está bloqueado. Clique no ícone 🔒 (ou 🎤) ao lado do endereço do site, escolha <b>Microfone → Permitir</b> e recarregue a página.",
+        "no-mic": "Não encontrei nenhum microfone. Conecte um fone com microfone e tente de novo.",
+        busy: "Outro programa está usando o microfone. Feche-o e tente de novo.",
+        network: "O reconhecimento de voz não respondeu (ele precisa de internet). Vamos usar o modo de gravação.",
+        unsupported: "Este navegador não reconhece fala. Use o Chrome ou o Edge — ou o modo de gravação.",
+      }[code] || "Não foi possível usar o microfone agora."
+    );
+  }
+
+  return { supported, canRecord, permission, ensurePermission, listen, stop, record, explain };
 })();
 
 document.addEventListener("click", (e) => {

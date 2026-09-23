@@ -60,7 +60,7 @@
   // ======================================================================
   //  Lições com exercícios
   // ======================================================================
-  const canSpeak = Mic.supported();
+  const canSpeak = Mic.supported() || Mic.canRecord();
   let speakingOff = !canSpeak;
   const queue = buildQueue();
   const total = queue.length;
@@ -181,7 +181,7 @@
         <div class="ex-label" style="justify-content:center;display:flex">${unit.icon} ${esc(unit.title)} · ${info.label}</div>
         <h2 style="color:var(--title)">${node === "test" ? "Desafio da unidade 🏆" : node === "practice" ? "Vamos praticar! 💪" : "Novas palavras ✨"}</h2>
         ${content}
-        ${canSpeak ? "" : `<p class="sub" style="font-size:.9rem">🎤 Seu navegador não reconhece fala — use o Chrome ou o Edge para os exercícios de pronúncia.</p>`}
+        ${Mic.supported() ? "" : `<p class="sub" style="font-size:.9rem">🎤 Seu navegador não reconhece fala. Nos exercícios de pronúncia você grava a sua voz e compara com a da Bibi. Para correção automática, use o Chrome ou o Edge.</p>`}
       </div>`;
     body.querySelectorAll("[data-say]").forEach((b) => b.addEventListener("click", () => Sounds.say(b.dataset.say)));
     footer.className = "lesson-footer";
@@ -427,48 +427,26 @@
               <div><div>${esc(e.en)}</div><div class="speech-pt">${esc(e.pt)}</div></div>
             </div>
           </div>
-          <div class="mic-area">
-            <button class="mic-btn" id="micBtn" aria-label="Falar">🎤</button>
-            <div class="mic-status" id="micStatus">Toque no microfone e fale em inglês</div>
-          </div>
+          <div class="mic-area" id="micArea"></div>
         </div>`;
       body.querySelector("[data-say]").addEventListener("click", () => Sounds.say(e.en));
-      const micBtn = body.querySelector("#micBtn");
-      const status = body.querySelector("#micStatus");
       let tries = 0;
-      let listening = false;
-      micBtn.addEventListener("click", async () => {
-        if (listening) return Mic.stop();
-        Sounds.stop();
-        listening = true;
-        micBtn.classList.add("live");
-        status.textContent = "Ouvindo... fale agora";
-        try {
-          const heard = await Mic.listen({ onInterim: (t) => (status.textContent = "“" + t + "”") });
-          listening = false;
-          micBtn.classList.remove("live");
+      micWidget(body.querySelector("#micArea"), {
+        hint: "Toque no microfone e fale a frase em inglês",
+        compareText: e.en,
+        onCompareOk: () => showResult({ ok: true, note: "Muito bem! Continue treinando a pronúncia." }),
+        onHeard(heard, status) {
           if (state !== "answering") return;
           const best = bestMatch(heard, e.en);
-          if (best.score >= 0.7) {
-            showResult({ ok: true, note: `Você disse: “${best.text}”` });
-            return;
-          }
+          if (best.score >= 0.7) return showResult({ ok: true, note: `Você disse: “${best.text}”` });
           tries++;
-          if (tries >= 2) {
-            showResult({ soft: true, note: heard.length ? `Entendi: “${best.text}”. Ouça a Bibi e tente de novo depois!` : "Não consegui te ouvir. Verifique o microfone." });
-          } else {
-            status.innerHTML = heard.length
-              ? `Entendi: “${esc(best.text)}”<br><b>Quase! Tente de novo.</b>`
-              : "<b>Não ouvi nada.</b> Toque no microfone e fale mais perto.";
+          if (tries >= 3) {
+            return showResult({ soft: true, note: heard.length ? `Entendi: “${best.text}”. Ouça a Bibi e tente de novo depois!` : "Não consegui te ouvir. Verifique o microfone." });
           }
-        } catch (err) {
-          listening = false;
-          micBtn.classList.remove("live");
-          status.innerHTML =
-            err.message === "not-allowed" || err.message === "service-not-allowed"
-              ? "<b>Permita o uso do microfone</b> no navegador (ícone 🎤 na barra de endereço) ou toque em “Não posso falar agora”."
-              : "Não foi possível usar o microfone agora. Toque em “Não posso falar agora”.";
-        }
+          status.innerHTML = heard.length
+            ? `Entendi: “${esc(best.text)}”<br><b>Quase! Ouça a Bibi (🔊) e tente de novo.</b>`
+            : "<b>Não ouvi nada.</b> Fale um pouco mais alto e mais perto do microfone.";
+        },
       });
       e.check = () => ({ ok: false, answer: e.en });
     },
@@ -754,7 +732,7 @@
       }
       controls.innerHTML = `
         <div class="call-hint">💡 ${esc(line.hintPt)} <button class="pt-toggle" id="showModel">Ver exemplo</button><span id="model" hidden> — <i>${esc(line.model)}</i></span></div>
-        ${canTalk ? `<button class="mic-btn" id="micBtn" aria-label="Responder falando">🎤</button><div class="mic-status" id="micStatus">Toque no microfone e responda</div>` : ""}
+        ${canTalk ? `<div class="mic-area" id="callMic"></div>` : ""}
         <div class="call-type">
           <input type="text" id="typeAnswer" placeholder="${canTalk ? "ou digite sua resposta..." : "Digite sua resposta em inglês..."}" autocomplete="off">
           <button class="btn btn-blue btn-sm" id="sendBtn">Enviar</button>
@@ -774,31 +752,16 @@
         }
       });
       if (canTalk) {
-        const micBtn = controls.querySelector("#micBtn");
-        const status = controls.querySelector("#micStatus");
-        let listening = false;
-        micBtn.addEventListener("click", async () => {
-          if (listening) return Mic.stop();
-          listening = true;
-          micBtn.classList.add("live");
-          status.textContent = "Ouvindo... fale agora";
-          try {
-            const heard = await Mic.listen({ onInterim: (t) => (status.textContent = "“" + t + "”") });
-            listening = false;
-            micBtn.classList.remove("live");
+        micWidget(controls.querySelector("#callMic"), {
+          hint: "Toque no microfone e responda",
+          dark: true,
+          onHeard(heard, status) {
             if (!heard.length) {
-              status.innerHTML = "<b>Não ouvi nada.</b> Toque no microfone e fale mais perto.";
+              status.innerHTML = "<b>Não ouvi nada.</b> Fale mais alto — ou digite a resposta abaixo.";
               return;
             }
             answer(heard, false);
-          } catch (err) {
-            listening = false;
-            micBtn.classList.remove("live");
-            status.innerHTML =
-              err.message === "not-allowed" || err.message === "service-not-allowed"
-                ? "<b>Permita o uso do microfone</b> no navegador ou digite a resposta abaixo."
-                : "Microfone indisponível agora — digite a resposta abaixo.";
-          }
+          },
         });
       }
     }
@@ -923,6 +886,121 @@
     const n = " " + normalize(text) + " ";
     if (speechScore(text, line.model) >= 0.6) return true;
     return line.accept.some((k) => n.includes(" " + normalize(k) + " ") || (normalize(k).includes(" ") && n.includes(normalize(k))));
+  }
+
+  // ======================================================================
+  //  Microfone: permissão → ouvir (com barra de volume) → modo gravação se o reconhecimento falhar
+  // ======================================================================
+  async function micWidget(area, { hint, onHeard, compareText, onCompareOk, dark }) {
+    if (!area) return;
+    if (!Mic.supported()) return compareText && Mic.canRecord() ? compareMode(area, compareText, onCompareOk, Mic.explain("unsupported")) : (area.innerHTML = `<div class="mic-status">${Mic.explain("unsupported")}</div>`);
+    const perm = await Mic.permission();
+    if (perm === "granted") return listenMode();
+
+    area.innerHTML = `
+      <div class="mic-permission ${dark ? "dark" : ""}">
+        <div class="big">🎤</div>
+        <b>Ative o seu microfone</b>
+        <p>Clique no botão e, quando o navegador perguntar, escolha <b>Permitir</b>.</p>
+        <button class="btn btn-blue" data-allow>Ativar microfone</button>
+        <div class="mic-status" data-status>${perm === "denied" ? Mic.explain("denied") : ""}</div>
+      </div>`;
+    area.querySelector("[data-allow]").addEventListener("click", async () => {
+      const st = area.querySelector("[data-status]");
+      st.textContent = "Aguardando a permissão...";
+      try {
+        await Mic.ensurePermission();
+        Sounds.correct();
+        listenMode();
+      } catch (err) {
+        st.innerHTML = Mic.explain(err.message);
+      }
+    });
+
+    function listenMode() {
+      area.innerHTML = `
+        <button class="mic-btn" data-mic aria-label="Falar">🎤</button>
+        <div class="level-bar ${dark ? "dark" : ""}"><div data-level></div></div>
+        <div class="mic-status" data-status>${hint}</div>`;
+      const btn = area.querySelector("[data-mic]");
+      const st = area.querySelector("[data-status]");
+      const lvl = area.querySelector("[data-level]");
+      let listening = false;
+      btn.addEventListener("click", async () => {
+        if (listening) return Mic.stop();
+        Sounds.stop();
+        listening = true;
+        btn.classList.add("live");
+        st.innerHTML = "<b>Ouvindo...</b> fale agora (toque de novo para parar)";
+        try {
+          const heard = await Mic.listen({
+            onInterim: (t) => (st.textContent = "“" + t + "”"),
+            onLevel: (v) => (lvl.style.width = Math.round(v * 100) + "%"),
+          });
+          onHeard(heard, st);
+        } catch (err) {
+          if ((err.message === "network" || err.message === "unsupported") && compareText && Mic.canRecord()) {
+            return compareMode(area, compareText, onCompareOk, Mic.explain(err.message));
+          }
+          st.innerHTML = Mic.explain(err.message) + (compareText ? "" : " Você também pode digitar a resposta.");
+        } finally {
+          listening = false;
+          btn.classList.remove("live");
+          lvl.style.width = "0%";
+        }
+      });
+    }
+  }
+
+  // Plano B: o aluno grava a própria voz e compara com a da Bibi
+  function compareMode(area, text, onOk, why) {
+    area.innerHTML = `
+      <div class="compare">
+        <div class="mic-status">${why ? why + "<br>" : ""}<b>Grave sua voz e compare com a da Bibi.</b></div>
+        <button class="mic-btn" data-rec aria-label="Gravar">⏺</button>
+        <div class="level-bar"><div data-level></div></div>
+        <div class="compare-actions" data-actions hidden>
+          <button class="btn btn-white btn-sm" data-bibi>🔊 Bibi</button>
+          <button class="btn btn-white btn-sm" data-me>▶ Você</button>
+          <button class="btn btn-sm" data-ok>Ficou parecido ✓</button>
+        </div>
+      </div>`;
+    const recBtn = area.querySelector("[data-rec]");
+    const lvl = area.querySelector("[data-level]");
+    let session = null;
+    let url = null;
+    recBtn.addEventListener("click", async () => {
+      if (session) {
+        url = await session.stop();
+        session = null;
+        recBtn.classList.remove("live");
+        recBtn.textContent = "⏺";
+        lvl.style.width = "0%";
+        area.querySelector("[data-actions]").hidden = false;
+        new Audio(url).play();
+        return;
+      }
+      try {
+        Sounds.stop();
+        session = await Mic.record({ onLevel: (v) => (lvl.style.width = Math.round(v * 100) + "%") });
+        recBtn.classList.add("live");
+        recBtn.textContent = "⏹";
+        session.done.then((u) => {
+          if (session) {
+            url = u;
+            session = null;
+            recBtn.classList.remove("live");
+            recBtn.textContent = "⏺";
+            area.querySelector("[data-actions]").hidden = false;
+          }
+        });
+      } catch (err) {
+        area.querySelector(".mic-status").innerHTML = Mic.explain(err.message);
+      }
+    });
+    area.querySelector("[data-bibi]").addEventListener("click", () => Sounds.say(text));
+    area.querySelector("[data-me]").addEventListener("click", () => url && new Audio(url).play());
+    area.querySelector("[data-ok]").addEventListener("click", onOk);
   }
 
   // ---------- Utilidades ----------
