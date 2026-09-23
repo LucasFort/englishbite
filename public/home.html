@@ -5,14 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aprender — EnglishBite</title>
 <link rel="icon" href="img/bee.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#58cc02">
+<link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
+<script src="js/pwa.js" defer></script>
+<script src="js/theme.js"></script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="app">
     <nav class="sidebar">
       <a href="home.html" class="brand"><img src="img/bee.svg" alt=""> englishbite</a>
-      <a href="home.html" class="side-link active"><span class="ico">🏠</span><span class="label">Aprender</span></a>
+      <a href="#learn" class="side-link" data-tab="learn"><span class="ico">🏠</span><span class="label">Aprender</span></a>
+      <a href="#practice" class="side-link" data-tab="practice"><span class="ico">🎲</span><span class="label">Praticar</span><span class="dot" data-dot="practice" hidden></span></a>
+      <a href="#league" class="side-link" data-tab="league"><span class="ico">🏅</span><span class="label">Liga</span></a>
+      <a href="#quests" class="side-link" data-tab="quests"><span class="ico">📜</span><span class="label">Missões</span><span class="dot" data-dot="quests" hidden></span></a>
+      <a href="#shop" class="side-link" data-tab="shop"><span class="ico">🛍️</span><span class="label">Loja</span></a>
+      <a href="#profile" class="side-link" data-tab="profile"><span class="ico">👤</span><span class="label">Perfil</span></a>
+      <a href="#pro" class="side-link pro-link" data-tab="pro"><span class="ico">👑</span><span class="label">Pro</span></a>
       <a href="placement.html" class="side-link"><span class="ico">🎯</span><span class="label">Teste de nível</span></a>
+      <button class="side-link install-side" data-install><span class="ico">📲</span><span class="label">Baixar app</span></button>
       <button class="side-link" data-logout><span class="ico">🚪</span><span class="label">Sair</span></button>
     </nav>
 
@@ -21,11 +33,49 @@
         <div class="mobile-top">
           <div class="stats-bar" data-stats></div>
         </div>
-        <div id="path"><p style="color:var(--muted);text-align:center;padding:40px 0">Carregando sua trilha...</p></div>
+
+        <section class="view" data-view="learn">
+          <div id="streakAlert"></div>
+          <div id="path"><p style="color:var(--muted);text-align:center;padding:40px 0">Carregando sua trilha...</p></div>
+        </section>
+
+        <section class="view" data-view="practice" hidden>
+          <h1 class="view-title">Praticar</h1>
+          <p class="view-sub">Treinos que mudam todo dia e se adaptam aos seus erros.</p>
+          <div id="practiceBody"></div>
+        </section>
+
+        <section class="view" data-view="league" hidden>
+          <h1 class="view-title">Liga da semana</h1>
+          <p class="view-sub" id="leagueSub">Ganhe XP para subir no ranking. A liga recomeça toda segunda-feira.</p>
+          <div id="leagueBody"><p class="view-sub">Carregando...</p></div>
+        </section>
+
+        <section class="view" data-view="quests" hidden>
+          <h1 class="view-title">Missões do dia</h1>
+          <p class="view-sub" id="questsSub">Novas missões todo dia à meia-noite.</p>
+          <div id="questsBody"></div>
+        </section>
+
+        <section class="view" data-view="shop" hidden>
+          <h1 class="view-title">Loja</h1>
+          <p class="view-sub">Ganhe mel 🍯 completando fases, missões e desafios.</p>
+          <div id="shopBody"></div>
+        </section>
+
+        <section class="view" data-view="profile" hidden>
+          <div id="profileBody"></div>
+        </section>
+
+        <section class="view" data-view="pro" hidden>
+          <div id="proBody"></div>
+        </section>
       </main>
 
       <aside class="right-col">
         <div class="stats-bar" data-stats></div>
+        <div id="sideGoal"></div>
+        <div id="sideQuests"></div>
         <div class="card">
           <h3>Seu progresso</h3>
           <div class="row">
@@ -51,9 +101,11 @@
   </div>
 
   <nav class="bottom-nav">
-    <a href="home.html" class="side-link active"><span class="ico">🏠</span><span class="label">Aprender</span></a>
-    <a href="placement.html" class="side-link"><span class="ico">🎯</span><span class="label">Teste</span></a>
-    <button class="side-link" data-logout><span class="ico">🚪</span><span class="label">Sair</span></button>
+    <a href="#learn" class="side-link" data-tab="learn"><span class="ico">🏠</span><span class="label">Aprender</span></a>
+    <a href="#practice" class="side-link" data-tab="practice"><span class="ico">🎲</span><span class="label">Praticar</span><span class="dot" data-dot="practice" hidden></span></a>
+    <a href="#league" class="side-link" data-tab="league"><span class="ico">🏅</span><span class="label">Liga</span></a>
+    <a href="#quests" class="side-link" data-tab="quests"><span class="ico">📜</span><span class="label">Missões</span><span class="dot" data-dot="quests" hidden></span></a>
+    <a href="#profile" class="side-link" data-tab="profile"><span class="ico">👤</span><span class="label">Perfil</span></a>
   </nav>
 
   <div class="modal-backdrop" id="guideModal">
@@ -62,6 +114,8 @@
       <div id="guideBody"></div>
     </div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script src="js/sounds.js"></script>
   <script src="js/api.js"></script>
