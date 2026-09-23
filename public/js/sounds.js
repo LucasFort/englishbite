@@ -41,6 +41,7 @@ const Sounds = (() => {
   // 1º: gravações com a voz do dono do app (audio/voice/index.json)
   // 2º: áudios gerados por unidade (audio/<unidade>.mp3 + audio/index.json)
   // 3º: voz do navegador (speechSynthesis), só como último recurso
+  const VOICE_VOLUME = 0.6; // a voz estava alta demais em relação aos efeitos
   const norm = (t) => String(t).trim().toLowerCase().replace(/\s+/g, " ");
   let indexPromise = null;
   const buffers = {};
@@ -103,7 +104,10 @@ const Sounds = (() => {
         const src = c.createBufferSource();
         src.buffer = buffer;
         src.playbackRate.value = slow ? 0.72 : 1;
-        src.connect(c.destination);
+        const vol = c.createGain();
+        vol.gain.value = VOICE_VOLUME;
+        src.connect(vol);
+        vol.connect(c.destination);
         const start = clip.start != null ? Math.max(0, clip.start - 0.05) : 0;
         const dur = clip.dur != null ? clip.dur + 0.25 : undefined;
         current = src;
@@ -136,6 +140,7 @@ const Sounds = (() => {
       if (v) u.voice = v;
       u.lang = "en-US";
       u.rate = slow ? 0.6 : 0.95;
+      u.volume = VOICE_VOLUME;
       u.onend = () => resolve(true);
       u.onerror = () => resolve(false);
       setTimeout(() => speechSynthesis.speak(u), 60);
@@ -200,7 +205,34 @@ const Mic = (() => {
   const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null;
   let meter = null;
-  let recognitionBroken = false; // vira true se o serviço de reconhecimento falhar (ex.: sem internet)
+  let recognitionBroken = false; // vira true se não houver nenhum jeito de reconhecer fala
+  let useLocal = false; // reconhecimento no próprio computador (Chrome novo), sem depender da internet
+
+  // Estado do reconhecimento offline: available | downloadable | downloading | unavailable
+  async function localStatus() {
+    try {
+      if (!Rec || !Rec.available) return "unavailable";
+      return await Rec.available({ langs: ["en-US"], processLocally: true });
+    } catch (e) {
+      return "unavailable";
+    }
+  }
+  // Precisa ser chamado dentro de um clique (o Chrome exige). Resolve true quando estiver pronto.
+  async function installLocal(onWait) {
+    if (!Rec || !Rec.install) return false;
+    const ok = await Rec.install({ langs: ["en-US"], processLocally: true }).catch(() => false);
+    for (let i = 0; i < 60; i++) {
+      const s = await localStatus();
+      if (s === "available") {
+        useLocal = true;
+        return true;
+      }
+      if (s === "unavailable") return false;
+      if (onWait) onWait(i);
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    return ok && (await localStatus()) === "available";
+  }
 
   const canCapture = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   // Reconhece a fala de verdade (Chrome/Edge/Safari)
@@ -272,6 +304,7 @@ const Mic = (() => {
     if (!Rec) throw new Error("unsupported");
     stop();
     const stream = await openStream(); // garante a permissão antes de começar
+    if (!useLocal && (await localStatus()) === "available") useLocal = true;
     startMeter(stream, onLevel);
     return new Promise((resolve, reject) => {
       rec = new Rec();
@@ -279,6 +312,7 @@ const Mic = (() => {
       rec.interimResults = true;
       rec.maxAlternatives = 3;
       rec.continuous = false;
+      if (useLocal) rec.processLocally = true;
       let finals = [];
       let lastInterim = "";
       let failed = null;
@@ -293,8 +327,9 @@ const Mic = (() => {
       };
       rec.onerror = (e) => {
         if (e.error === "no-speech" || e.error === "aborted") return;
-        if (e.error === "network" || e.error === "service-not-allowed" || e.error === "language-not-supported") recognitionBroken = true;
-        failed = e.error === "not-allowed" ? "denied" : e.error === "audio-capture" ? "no-mic" : recognitionBroken ? "network" : e.error;
+        const serviceDown = ["network", "service-not-allowed", "language-not-supported"].includes(e.error);
+        if (serviceDown && useLocal) useLocal = false; // o offline falhou: volta a tentar o online
+        failed = e.error === "not-allowed" ? "denied" : e.error === "audio-capture" ? "no-mic" : serviceDown ? "network" : e.error;
       };
       rec.onend = () => {
         clearTimeout(guard);
@@ -349,13 +384,13 @@ const Mic = (() => {
           "O microfone está bloqueado. Clique no ícone 🔒 (ou 🎤) ao lado do endereço do site, escolha <b>Microfone → Permitir</b> e recarregue a página.",
         "no-mic": "Não encontrei nenhum microfone. Conecte um fone com microfone e tente de novo.",
         busy: "Outro programa está usando o microfone. Feche-o e tente de novo.",
-        network: "O reconhecimento de voz não respondeu (ele precisa de internet). Vamos usar o modo de gravação.",
+        network: "O reconhecimento de voz online do navegador não respondeu.",
         unsupported: "Este navegador não reconhece fala. Use o Chrome ou o Edge — ou o modo de gravação.",
       }[code] || "Não foi possível usar o microfone agora."
     );
   }
 
-  return { supported, canRecord, permission, ensurePermission, listen, stop, record, explain };
+  return { supported, canRecord, permission, ensurePermission, listen, stop, record, explain, localStatus, installLocal, markBroken: () => (recognitionBroken = true) };
 })();
 
 document.addEventListener("click", (e) => {

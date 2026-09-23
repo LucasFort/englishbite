@@ -908,6 +908,8 @@
     area.querySelector("[data-allow]").addEventListener("click", async () => {
       const st = area.querySelector("[data-status]");
       st.textContent = "Aguardando a permissão...";
+      // aproveita o clique para já preparar o reconhecimento offline do Chrome (quando existir)
+      Mic.localStatus().then((s) => s === "downloadable" && Mic.installLocal());
       try {
         await Mic.ensurePermission();
         Sounds.correct();
@@ -939,8 +941,15 @@
           });
           onHeard(heard, st);
         } catch (err) {
-          if ((err.message === "network" || err.message === "unsupported") && compareText && Mic.canRecord()) {
-            return compareMode(area, compareText, onCompareOk, Mic.explain(err.message));
+          if (err.message === "network") {
+            const local = await Mic.localStatus();
+            if (local === "downloadable" || local === "downloading") return offerOffline();
+          }
+          if (err.message === "network" || err.message === "unsupported") {
+            Mic.markBroken();
+            if (compareText && Mic.canRecord()) return compareMode(area, compareText, onCompareOk, Mic.explain(err.message));
+            st.innerHTML = Mic.explain(err.message) + " Digite a sua resposta abaixo.";
+            return;
           }
           st.innerHTML = Mic.explain(err.message) + (compareText ? "" : " Você também pode digitar a resposta.");
         } finally {
@@ -950,6 +959,33 @@
         }
       });
     }
+
+  // O reconhecimento online falhou: oferece o offline do Chrome (precisa de um clique para baixar)
+  function offerOffline() {
+    area.innerHTML = `
+      <div class="mic-permission ${dark ? "dark" : ""}">
+        <div class="big">📥</div>
+        <b>Ative o reconhecimento de voz offline</b>
+        <p>O reconhecimento online do navegador não respondeu. O Chrome pode baixar o de inglês para funcionar direto no seu computador (só na primeira vez).</p>
+        <button class="btn btn-blue" data-offline>Ativar reconhecimento offline</button>
+        <div class="mic-status" data-status></div>
+      </div>`;
+    area.querySelector("[data-offline]").addEventListener("click", async (ev) => {
+      ev.target.disabled = true;
+      const st = area.querySelector("[data-status]");
+      st.textContent = "Baixando o reconhecimento de voz... pode levar até um minuto.";
+      const ok = await Mic.installLocal((i) => (st.textContent = "Baixando o reconhecimento de voz" + ".".repeat((i % 3) + 1)));
+      if (ok) {
+        Sounds.correct();
+        listenMode();
+        area.querySelector("[data-status]").innerHTML = "<b>Pronto!</b> Toque no microfone e fale.";
+      } else {
+        Mic.markBroken();
+        if (compareText && Mic.canRecord()) compareMode(area, compareText, onCompareOk, "Não foi possível ativar o reconhecimento offline.");
+        else st.innerHTML = "Não foi possível ativar o reconhecimento de voz neste navegador. Digite a sua resposta abaixo.";
+      }
+    });
+  }
   }
 
   // Plano B: o aluno grava a própria voz e compara com a da Bibi
